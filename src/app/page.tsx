@@ -1,27 +1,29 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Integrations from "@/components/Integrations";
-import DevExperience from "@/components/DevExperience";
-import FeaturesGrid from "@/components/FeaturesGrid";
-import CodeSection from "@/components/CodeSection";
+import About from "@/components/About";
+import Projects from "@/components/Projects";
+import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
-import Pricing from "@/components/Pricing";
-import BottomCTA from "@/components/BottomCTA";
+import TechStack from "@/components/TechStack";
+import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import CursorFollower from "@/components/CursorFollower";
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 export default function Home() {
   return (
     <>
+      <CursorFollower />
+      <BackgroundEffects />
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <Hero />
-        <Integrations />
-        <DevExperience />
-        <FeaturesGrid />
-        <CodeSection />
+        <About />
+        <Projects />
+        <Services />
         <Testimonials />
-        <Pricing />
-        <BottomCTA />
+        <TechStack />
+        <Contact />
       </main>
       <Footer />
     </>
