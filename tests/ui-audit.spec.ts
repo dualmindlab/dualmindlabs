@@ -1,6 +1,6 @@
 /**
- * ui-audit.spec.ts — Dual Mind Labs visual & accessibility regression suite
- *
+ *  ui-audit.spec.ts — Dual Mind Labs visual & accessibility regression suite
+ * 
  * Covers:
  *   1. Visual regression   — pixel-perfect snapshots of Hero, Services bento,
  *                            TechStack bento, About team cards, Contact form
