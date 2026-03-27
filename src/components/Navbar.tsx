@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import Logo from "./Logo";
+import { MagneticButton } from "./MagneticButton";
 
 const links = [
   { label: "About", href: "#about" },
@@ -64,9 +65,9 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 navbar-glass ${
           scrolled
-            ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.4)]"
+            ? "is-scrolled bg-black/70 backdrop-blur-2xl border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
             : "bg-transparent"
         }`}
       >
@@ -102,10 +103,10 @@ export default function Navbar() {
                   transition={{ delay: 0.1 + i * 0.05, duration: 0.4 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`relative px-3.5 py-1.5 text-[13px] font-body rounded-lg transition-all duration-300 ${
+                  className={`relative px-3.5 py-1.5 text-[17px] font-body rounded-lg transition-all duration-300 ${
                     isActive
                       ? "text-white bg-white/[0.08] shadow-[0_0_12px_rgba(255,255,255,0.04)]"
-                      : "text-white/40 hover:text-white/80 hover:bg-white/[0.04]"
+                      : "text-white/80 hover:text-white/80 hover:bg-white/[0.04]"
                   }`}
                 >
                   {l.label}
@@ -124,31 +125,26 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <motion.a
-              href="#contact"
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.35, duration: 0.4 }}
-              whileHover={{
-                scale: 1.06,
-                boxShadow: "0 0 25px rgba(255,255,255,0.1), 0 4px 15px rgba(255,255,255,0.05)",
-              }}
-              whileTap={{ scale: 0.94 }}
-              className="hidden sm:inline-flex items-center gap-2 text-[13px] font-medium font-body bg-white text-black px-5 py-2 rounded-lg transition-all duration-200"
+              className="hidden sm:block"
             >
-              Get in Touch
-              <motion.svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                className="transition-transform"
-              >
-                <path d="M5 12h14m-6-6l6 6-6 6" />
-              </motion.svg>
-            </motion.a>
+              <MagneticButton strength={0.4}>
+                <motion.a
+                  href="#contact"
+                  whileHover={{ scale: 1.06, boxShadow: "0 0 25px rgba(255,255,255,0.12)" }}
+                  whileTap={{ scale: 0.94 }}
+                  className="inline-flex items-center gap-2 text-[15px] font-medium font-body bg-white text-black px-5 py-2 rounded-lg"
+                >
+                  Start a Project
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M5 12h14m-6-6l6 6-6 6" />
+                  </svg>
+                </motion.a>
+              </MagneticButton>
+            </motion.div>
 
             {/* Mobile toggle */}
             <motion.button
@@ -185,10 +181,10 @@ export default function Navbar() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     whileTap={{ scale: 0.97, x: 4 }}
-                    className={`block px-3 py-3 text-[15px] font-body rounded-lg transition-all ${
+                    className={`block px-3 py-3 text-[17px] font-body rounded-lg transition-all ${
                       activeSection === l.href
                         ? "text-white/90 bg-white/[0.05]"
-                        : "text-white/50 hover:text-white/80 hover:bg-white/[0.04]"
+                        : "text-white/70 hover:text-white/80 hover:bg-white/[0.04]"
                     }`}
                   >
                     {l.label}
@@ -199,7 +195,7 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className="block mt-3 text-center text-[14px] font-medium bg-white text-black px-4 py-3 rounded-lg"
                 >
-                  Get in Touch
+                  Start a Project
                 </a>
               </div>
             </motion.div>

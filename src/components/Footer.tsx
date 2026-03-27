@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Logo from "./Logo";
+import { MagneticButton } from "./MagneticButton";
 
 const footerLinks = [
   {
@@ -17,10 +18,10 @@ const footerLinks = [
   {
     title: "Services",
     links: [
-      { label: "Web Development", href: "#services" },
-      { label: "Mobile Apps", href: "#services" },
-      { label: "AI Solutions", href: "#services" },
-      { label: "Custom Software", href: "#services" },
+      { label: "AEO-Optimized SaaS", href: "#services" },
+      { label: "Agentic Workflows", href: "#services" },
+      { label: "Mobile Products", href: "#services" },
+      { label: "Systems of Scale", href: "#services" },
     ],
   },
   {
@@ -68,9 +69,9 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="text-[11px] font-mono text-white/40 uppercase tracking-[0.25em] mb-4"
+            className="text-[11px] font-mono text-white/80 uppercase tracking-[0.25em] mb-4"
           >
-            Ready to start?
+            Ready to build something that scales?
           </motion.p>
           <motion.h3
             initial={{ opacity: 0, y: 20 }}
@@ -79,16 +80,16 @@ export default function Footer() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-[clamp(1.8rem,4vw,2.8rem)] font-display font-bold text-white tracking-[-0.03em] mb-4"
           >
-            Let&apos;s build something great together
+            Let&apos;s build something ambitious
           </motion.h3>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-[15px] font-body text-white/40 max-w-[440px] mx-auto leading-[1.8] mb-8"
+            className="text-[17px] font-body text-white/80 max-w-[440px] mx-auto leading-[1.8] mb-8"
           >
-            We&apos;re always excited to discuss new projects and ideas. Drop us a line and let&apos;s get started.
+            We&apos;re always excited to work on ambitious products. Drop us a line and let&apos;s build.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -97,25 +98,29 @@ export default function Footer() {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="flex items-center justify-center gap-4 flex-wrap"
           >
-            <motion.a
-              href="#contact"
-              whileHover={{ scale: 1.05, boxShadow: "0 0 35px rgba(255,255,255,0.1)" }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-flex items-center gap-2.5 bg-white text-black font-semibold font-body text-[14px] px-7 py-3.5 rounded-xl transition-all"
-            >
-              Start a Project
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M5 12h14m-6-6l6 6-6 6" />
-              </svg>
-            </motion.a>
-            <motion.a
-              href="mailto:hello@dualmindlabs.com"
-              whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.05)" }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 font-body text-[14px] font-medium px-6 py-3.5 rounded-xl border border-white/[0.08] transition-all"
-            >
-              hello@dualmindlabs.com
-            </motion.a>
+            <MagneticButton strength={0.3}>
+              <motion.a
+                href="#contact"
+                whileHover={{ scale: 1.05, boxShadow: "0 0 35px rgba(255,255,255,0.12)" }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2.5 bg-white text-black font-semibold font-body text-[14px] px-7 py-3.5 rounded-xl transition-all"
+              >
+                Start a Project
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path d="M5 12h14m-6-6l6 6-6 6" />
+                </svg>
+              </motion.a>
+            </MagneticButton>
+            <MagneticButton strength={0.3}>
+              <motion.a
+                href="mailto:hello@dualmindlabs.com"
+                whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.05)" }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 text-white/70 hover:text-white/80 font-body text-[14px] font-medium px-6 py-3.5 rounded-xl border border-white/[0.08] transition-all"
+              >
+                hello@dualmindlabs.com
+              </motion.a>
+            </MagneticButton>
           </motion.div>
         </motion.div>
 
@@ -139,8 +144,8 @@ export default function Footer() {
                 Dual Mind Labs
               </span>
             </motion.a>
-            <p className="text-[14px] font-body text-white/40 leading-[1.8] max-w-[300px] mb-7">
-              A two-person dev studio building scalable web, mobile, and AI-powered products for startups and businesses.
+            <p className="text-[17px] font-body text-white/80 leading-[1.8] max-w-[300px] mb-7">
+              AI-native dev studio building AEO-optimized SaaS architectures and autonomous multi-agentic workflows.
             </p>
 
             {/* Social icons */}
@@ -156,7 +161,7 @@ export default function Footer() {
                     borderColor: "rgba(255,255,255,0.15)",
                   }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/70 transition-all"
+                  className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/72 hover:text-white/70 transition-all"
                   aria-label={s.label}
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -177,7 +182,7 @@ export default function Footer() {
                 viewport={{ once: false }}
                 transition={{ delay: si * 0.1, duration: 0.5 }}
               >
-                <h4 className="text-[11px] font-mono font-semibold text-white/50 mb-5 uppercase tracking-[0.2em]">
+                <h4 className="text-[11px] font-mono font-semibold text-white/70 mb-5 uppercase tracking-[0.2em]">
                   {section.title}
                 </h4>
                 <ul className="space-y-3.5">
@@ -186,7 +191,7 @@ export default function Footer() {
                       <motion.a
                         href={link.href}
                         whileHover={{ x: 4 }}
-                        className="text-[13px] font-body text-white/35 hover:text-white/70 transition-colors duration-200 inline-flex items-center gap-2 group"
+                        className="text-[17px] font-body text-white/75 hover:text-white/70 transition-colors duration-200 inline-flex items-center gap-2 group"
                       >
                         <span className="w-0 group-hover:w-2 h-px bg-white/40 transition-all duration-300" />
                         {link.label}
@@ -210,20 +215,20 @@ export default function Footer() {
           transition={{ duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-between gap-4"
         >
-          <p className="text-[12px] font-mono text-white/25">
+          <p className="text-[14px] font-mono text-white/68">
             &copy; {new Date().getFullYear()} Dual Mind Labs. All rights reserved.
           </p>
 
           {/* Back to top */}
           <div className="flex items-center gap-6">
-            <p className="text-[11px] font-mono text-white/20">
+            <p className="text-[11px] font-mono text-white/32">
               Designed & built by Ashwin & Mohit
             </p>
             <motion.a
               href="#"
               whileHover={{ y: -3, scale: 1.1, backgroundColor: "rgba(255,255,255,0.06)" }}
               whileTap={{ scale: 0.9 }}
-              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:border-white/[0.12] transition-all"
+              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/72 hover:text-white/80 hover:border-white/[0.12] transition-all"
               aria-label="Back to top"
             >
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

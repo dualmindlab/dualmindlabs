@@ -72,7 +72,7 @@ export default function Testimonials() {
           <h2 className="section-heading text-[clamp(2rem,4.5vw,3.2rem)] gradient-text">
             What clients say
           </h2>
-          <p className="mt-5 text-[16px] font-body text-white/40 max-w-[420px] mx-auto leading-[1.8]">
+          <p className="mt-5 text-[17px] font-body text-white/80 max-w-[420px] mx-auto leading-[1.8]">
             Don&apos;t just take our word for it — hear from the teams we&apos;ve worked with.
           </p>
         </motion.div>
@@ -125,7 +125,7 @@ export default function Testimonials() {
                 </div>
 
                 {/* Quote */}
-                <p className="text-[14px] font-body text-white/40 leading-[1.85] mb-6 flex-1 group-hover:text-white/55 transition-colors">
+                <p className="text-[17px] font-body text-white/80 leading-[1.85] mb-6 flex-1 group-hover:text-white/80 transition-colors">
                   &ldquo;{t.quote}&rdquo;
                 </p>
 
@@ -133,13 +133,13 @@ export default function Testimonials() {
                 <div className="flex items-center gap-3 pt-5 border-t border-white/[0.05]">
                   <motion.div
                     whileHover={{ scale: 1.1, rotate: -5 }}
-                    className="w-9 h-9 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[10px] font-display font-bold text-white/50"
+                    className="w-9 h-9 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[10px] font-display font-bold text-white/70"
                   >
                     {t.name.split(" ").map(n => n[0]).join("")}
                   </motion.div>
                   <div>
-                    <div className="text-[13px] font-body font-medium text-white/65">{t.name}</div>
-                    <div className="text-[11px] font-mono text-white/25">{t.role}</div>
+                    <div className="text-[17px] font-body font-medium text-white/82">{t.name}</div>
+                    <div className="text-[11px] font-mono text-white/68">{t.role}</div>
                   </div>
                 </div>
               </motion.div>
