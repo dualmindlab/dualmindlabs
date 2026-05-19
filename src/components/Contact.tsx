@@ -1,285 +1,432 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MagneticButton } from "./MagneticButton";
+import { motion } from "framer-motion";
+import SectionLabel from "./SectionLabel";
 
-const steps = [
-  {
-    id: 1,
-    question: "What brings you here?",
-    options: [
-      { id: "a", label: "Build from scratch", desc: "I have a product idea and need to build it" },
-      { id: "b", label: "Add AI capabilities", desc: "I need AI added to an existing product" },
-      { id: "c", label: "Scale infrastructure", desc: "I need backend systems to handle growth" },
-      { id: "d", label: "Explore AI agents", desc: "I want to see what's possible with AI agents" },
-    ],
-  },
-  {
-    id: 2,
-    question: "What stage is your project?",
-    options: [
-      { id: "a", label: "Pre-seed / Idea stage", desc: "Need an MVP to validate the concept" },
-      { id: "b", label: "Seed", desc: "Need a production-ready V1" },
-      { id: "c", label: "Series A+", desc: "Need to move fast and scale" },
-      { id: "d", label: "Enterprise", desc: "Bespoke, high-complexity requirements" },
-    ],
-  },
-  {
-    id: 3,
-    question: "What's your timeline?",
-    options: [
-      { id: "a", label: "ASAP", desc: "Within the next 4 weeks" },
-      { id: "b", label: "1–3 months", desc: "Measured, structured rollout" },
-      { id: "c", label: "3–6 months", desc: "Phased, long-horizon build" },
-      { id: "d", label: "Still planning", desc: "Exploring options first" },
-    ],
-  },
+const EMAIL = "ashwin.hingave123@gmail.com";
+
+const budgetOptions = [
+  { value: "", label: "Select a range...", disabled: true },
+  { value: "<1L", label: "< ₹1 Lakh" },
+  { value: "1-5L", label: "₹1L – ₹5L" },
+  { value: "5-20L", label: "₹5L – ₹20L" },
+  { value: "20L+", label: "₹20L+" },
+  { value: "discuss", label: "Let's discuss" },
 ];
 
-type Answers = { [key: number]: string };
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "var(--color-bg-primary)",
+  border: "1px solid var(--color-border)",
+  color: "var(--color-text-primary)",
+  padding: "0.95rem 1rem",
+  fontFamily: "var(--font-geist-sans)",
+  fontSize: "var(--text-body)",
+  letterSpacing: "var(--ls-default)",
+  borderRadius: "var(--radius-sm)",
+  transition: "border-color 150ms, background 150ms",
+};
+
+const inputFocusCss = `
+  .contact-form input:focus,
+  .contact-form textarea:focus,
+  .contact-form select:focus {
+    border-color: var(--color-accent-teal);
+    outline: none;
+  }
+`;
 
 export default function Contact() {
-  const [step, setStep] = useState(1);
-  const [answers, setAnswers] = useState<Answers>({});
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    company: "",
+    description: "",
+    budget: "",
+  });
 
-  const progress = submitted ? 100 : (step / 4) * 100;
-  const currentStep = steps[step - 1];
-
-  const handleOption = (optionId: string) => {
-    setAnswers((prev) => ({ ...prev, [step]: optionId }));
-    setTimeout(() => setStep((s) => s + 1), 300);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // noop
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && email) setSubmitted(true);
+    const subject = encodeURIComponent(
+      `Project Enquiry${form.company ? ` — ${form.company}` : ""}`
+    );
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nCompany: ${form.company || "N/A"}\nBudget: ${form.budget || "N/A"}\n\n${form.description}`
+    );
+    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
   };
 
   return (
-    <section id="contact" className="relative py-32 md:py-40 px-6 overflow-hidden">
-      {/* Background accents */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-500/[0.04] blur-[140px] pointer-events-none" />
-      <div className="absolute top-[15%] right-[10%] w-[250px] h-[250px] rounded-full bg-white/[0.008] blur-[80px] pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent pointer-events-none" />
+    <section id="contact" style={{ position: "relative" }}>
+      {/* Backdrop glow */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "20%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "800px",
+          height: "400px",
+          background:
+            "radial-gradient(ellipse, rgba(6,201,168,0.08), transparent 60%)",
+          filter: "blur(60px)",
+          pointerEvents: "none",
+        }}
+      />
 
-      <div className="relative z-10 max-w-[640px] mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 50, rotateX: -8 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: false, margin: "-60px" }}
-          transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="text-center mb-12"
-          style={{ perspective: "800px" }}
+      <div className="container" style={{ position: "relative" }}>
+        <SectionLabel index="06" text="CONTACT" />
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="section-h2"
+          style={{ marginBottom: "3rem" }}
         >
-          <p className="section-label mb-4">Let&apos;s Talk</p>
-          <h2 className="section-heading text-[clamp(2.2rem,5.5vw,3.4rem)] gradient-text mb-4">
-            Tell us about your project
-          </h2>
-          <p className="text-[17px] font-body text-white/80 max-w-[420px] mx-auto leading-[1.8]">
-            Four quick questions — then we come back with a real proposal, not a price list.
-          </p>
-        </motion.div>
+          Got a project?{" "}
+          <span style={{ color: "var(--color-accent-teal)" }}>Let&apos;s talk.</span>
+        </motion.h2>
 
-        {/* Sales assistant card */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.97 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: false, margin: "-40px" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
-          className="card-shadow rounded-2xl border border-white/[0.06] bg-[#0a0a0a]/80 backdrop-blur-sm p-8 md:p-10 hover:border-white/[0.1] transition-all"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="grid-2"
         >
-          {/* Progress bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-mono text-white/68 uppercase tracking-[0.15em]">
-                {submitted ? "Complete" : `Step ${step} of 4`}
+          {/* Left */}
+          <div>
+            <p
+              className="text-body"
+              style={{
+                color: "var(--color-text-secondary)",
+                lineHeight: 1.8,
+                marginBottom: "2.5rem",
+              }}
+            >
+              I work with founders, operators, and engineering teams who need
+              real software built — not wireframes, not decks.
+              <br />
+              <br />
+              Industrial IoT systems, computer vision pipelines, full-stack
+              SaaS platforms — if the problem is real, I want to hear about it.
+              <br />
+              <br />
+              Most projects start with a scoping call.{" "}
+              <span style={{ color: "var(--color-text-primary)" }}>
+                No retainer required to explore.
               </span>
-              <span className="text-[11px] font-mono text-purple-400/60">{Math.round(progress)}%</span>
+            </p>
+
+            {/* Email card */}
+            <div
+              style={{
+                background: "var(--color-bg-secondary)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                boxShadow: "var(--shadow-card)",
+                padding: "1.5rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <p
+                className="text-eyebrow"
+                style={{ color: "var(--color-text-dim)", marginBottom: "0.5rem" }}
+              >
+                DIRECT EMAIL
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                }}
+              >
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className="link-underline text-mono"
+                  style={{
+                    fontSize: "var(--text-body)",
+                    color: "var(--color-accent-teal)",
+                    textDecoration: "none",
+                  }}
+                >
+                  {EMAIL}
+                </a>
+                <button
+                  onClick={handleCopy}
+                  className="text-eyebrow"
+                  style={{
+                    color: copied ? "#22c55e" : "var(--color-text-secondary)",
+                    background: "transparent",
+                    border: `1px solid ${copied ? "#22c55e" : "var(--color-border)"}`,
+                    borderRadius: "var(--radius-sm)",
+                    padding: "0.5rem 0.85rem",
+                    cursor: "pointer",
+                    transition: "all 150ms",
+                  }}
+                >
+                  {copied ? "✓ COPIED" : "COPY"}
+                </button>
+              </div>
             </div>
-            <div className="w-full h-[3px] rounded-full bg-white/[0.05] overflow-hidden">
-              <motion.div
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                className="h-full rounded-full"
-                style={{ background: "linear-gradient(90deg, #6366f1, #8b5cf6)" }}
+
+            {/* Response time */}
+            <div
+              style={{
+                background: "var(--color-bg-secondary)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                boxShadow: "var(--shadow-card)",
+                padding: "1.5rem",
+                marginBottom: "2rem",
+                display: "flex",
+                gap: "1rem",
+                alignItems: "center",
+              }}
+            >
+              <span
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background: "#22c55e",
+                  flexShrink: 0,
+                  animation: "pulse-dot 2s ease-in-out infinite",
+                }}
               />
+              <div>
+                <p
+                  className="text-eyebrow"
+                  style={{ color: "var(--color-text-dim)", marginBottom: "0.3rem" }}
+                >
+                  RESPONSE TIME
+                </p>
+                <p
+                  className="text-body-sm"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  Usually within 24 hours · IST
+                </p>
+              </div>
+            </div>
+
+            {/* Social */}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <SocialIcon
+                href="https://github.com/ashwinhingve"
+                label="GitHub"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              </SocialIcon>
+              <SocialIcon href="https://www.linkedin.com/in/ashwinhingve" label="LinkedIn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+              </SocialIcon>
+              <SocialIcon href={`mailto:${EMAIL}`} label="Email">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <rect x="2" y="4" width="20" height="16" rx="1" />
+                  <path d="M2 6l10 8 10-8" />
+                </svg>
+              </SocialIcon>
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            {/* Steps 1–3: option selection */}
-            {!submitted && step <= 3 && (
-              <motion.div
-                key={`step-${step}`}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+          {/* Right: form */}
+          <style>{inputFocusCss}</style>
+          <form
+            onSubmit={handleSubmit}
+            className="contact-form"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              padding: "2rem",
+              background: "var(--color-bg-secondary)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+              boxShadow: "var(--shadow-card)",
+            }}
+          >
+            <p
+              className="text-eyebrow"
+              style={{ color: "var(--color-text-dim)", marginBottom: "0.5rem" }}
+            >
+              PROJECT ENQUIRY
+            </p>
+            <FormField label="Name">
+              <input
+                type="text"
+                placeholder="Your name"
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                style={inputStyle}
+              />
+            </FormField>
+            <FormField label="Company (optional)">
+              <input
+                type="text"
+                placeholder="Company name"
+                value={form.company}
+                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                style={inputStyle}
+              />
+            </FormField>
+            <FormField label="What are you building?">
+              <textarea
+                placeholder="Describe the problem and the system you want built..."
+                required
+                rows={5}
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+                style={{ ...inputStyle, resize: "vertical" }}
+              />
+            </FormField>
+            <FormField label="Budget range">
+              <select
+                value={form.budget}
+                onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                style={{
+                  ...inputStyle,
+                  appearance: "none",
+                  cursor: "pointer",
+                  color: form.budget ? "var(--color-text-primary)" : "var(--color-text-dim)",
+                  backgroundImage:
+                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%238A8A9A' stroke-width='1.2'/%3E%3C/svg%3E\")",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 1rem center",
+                }}
               >
-                <h3 className="text-[20px] font-display font-semibold text-white/90 tracking-[-0.02em] mb-6">
-                  {currentStep.question}
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {currentStep.options.map((opt, oi) => {
-                    const isSelected = answers[step] === opt.id;
-                    return (
-                      <motion.button
-                        key={opt.id}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: oi * 0.06 }}
-                        onClick={() => handleOption(opt.id)}
-                        whileHover={{ scale: 1.03, borderColor: "rgba(139,92,246,0.4)" }}
-                        whileTap={{ scale: 0.97 }}
-                        className="text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer"
-                        style={{
-                          borderColor: isSelected ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)",
-                          background: isSelected ? "rgba(139,92,246,0.08)" : "rgba(255,255,255,0.02)",
-                        }}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="text-[17px] font-body font-medium text-white/80 mb-0.5">{opt.label}</p>
-                            <p className="text-[17px] font-body text-white/75 leading-[1.6]">{opt.desc}</p>
-                          </div>
-                          {isSelected && (
-                            <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ background: "rgba(139,92,246,0.3)", border: "1px solid rgba(139,92,246,0.5)" }}>
-                              <svg width="9" height="9" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" viewBox="0 0 24 24">
-                                <path d="M20 6L9 17l-5-5" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-
-                {/* Back button */}
-                {step > 1 && (
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    onClick={() => setStep((s) => s - 1)}
-                    className="mt-5 text-[14px] font-mono text-white/68 hover:text-white/70 transition-colors flex items-center gap-1.5"
+                {budgetOptions.map((o) => (
+                  <option
+                    key={o.value}
+                    value={o.value}
+                    disabled={o.disabled}
+                    style={{ background: "var(--color-bg-secondary)" }}
                   >
-                    <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M19 12H5m6-7l-7 7 7 7" />
-                    </svg>
-                    Back
-                  </motion.button>
-                )}
-              </motion.div>
-            )}
-
-            {/* Step 4: contact details */}
-            {!submitted && step === 4 && (
-              <motion.div
-                key="step-4"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-[20px] font-display font-semibold text-white/90 tracking-[-0.02em] mb-2">
-                  Almost done — how should we reach you?
-                </h3>
-                <p className="text-[17px] font-body text-white/75 mb-6">We&apos;ll send a scope-matched proposal within 24 hours.</p>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[11px] font-mono text-white/75 uppercase tracking-[0.2em] mb-2">Name</label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Your name"
-                        required
-                        className="w-full px-4 py-3.5 text-[17px] font-body rounded-lg bg-white/[0.03] border border-white/[0.07] text-white/80 placeholder:text-white/32 outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(139,92,246,0.06)] transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-mono text-white/75 uppercase tracking-[0.2em] mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@company.com"
-                        required
-                        className="w-full px-4 py-3.5 text-[17px] font-body rounded-lg bg-white/[0.03] border border-white/[0.07] text-white/80 placeholder:text-white/32 outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(139,92,246,0.06)] transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <MagneticButton strength={0.25} className="w-full">
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      className="w-full btn-neon font-body font-semibold text-[14px] py-3.5 rounded-xl flex items-center justify-center gap-2.5"
-                    >
-                      Get My Custom Proposal
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path d="M5 12h14m-6-6l6 6-6 6" />
-                      </svg>
-                    </motion.button>
-                  </MagneticButton>
-                </form>
-
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={() => setStep(3)}
-                  className="mt-4 text-[14px] font-mono text-white/68 hover:text-white/70 transition-colors flex items-center gap-1.5"
-                >
-                  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M19 12H5m6-7l-7 7 7 7" />
-                  </svg>
-                  Back
-                </motion.button>
-              </motion.div>
-            )}
-
-            {/* Confirmation */}
-            {submitted && (
-              <motion.div
-                key="confirmation"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                className="text-center py-6"
-              >
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
-                  style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.3)", boxShadow: "0 0 20px rgba(139,92,246,0.2)" }}
-                >
-                  <svg width="22" height="22" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </div>
-                <h3 className="text-[22px] font-display font-semibold text-white/90 tracking-[-0.02em] mb-3">
-                  You&apos;re in the queue
-                </h3>
-                <p className="text-[17px] font-body text-white/82 max-w-[380px] mx-auto leading-[1.8]">
-                  We&apos;ll analyze your answers and reach out within 24 hours with a no-fluff, scope-matched proposal.
-                </p>
-                <p className="mt-5 text-[14px] font-mono text-white/68">
-                  Questions in the meantime?{" "}
-                  <a href="mailto:hello@dualmindlabs.com" className="text-purple-400/60 hover:text-purple-400 transition-colors underline underline-offset-2">
-                    hello@dualmindlabs.com
-                  </a>
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <button
+              type="submit"
+              className="text-mono"
+              style={{
+                width: "100%",
+                background: "var(--color-accent-teal)",
+                color: "var(--color-bg-primary)",
+                border: "none",
+                borderRadius: "var(--radius-sm)",
+                padding: "1.05rem",
+                fontWeight: 500,
+                letterSpacing: "var(--ls-mono)",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                transition: "transform 200ms, box-shadow 200ms",
+                marginTop: "0.5rem",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "var(--shadow-glow-teal)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              SEND MESSAGE →
+            </button>
+          </form>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label style={{ display: "block" }}>
+      <span
+        className="text-eyebrow"
+        style={{
+          color: "var(--color-text-secondary)",
+          marginBottom: "0.4rem",
+          display: "block",
+        }}
+      >
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+      aria-label={label}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "44px",
+        height: "44px",
+        background: "var(--color-bg-secondary)",
+        border: "1px solid var(--color-border)",
+        color: "var(--color-text-secondary)",
+        transition: "color 150ms, border-color 150ms, transform 150ms",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.color = "var(--color-accent-teal)";
+        e.currentTarget.style.borderColor = "var(--color-accent-teal)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.color = "var(--color-text-secondary)";
+        e.currentTarget.style.borderColor = "var(--color-border)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
+    >
+      {children}
+    </a>
   );
 }

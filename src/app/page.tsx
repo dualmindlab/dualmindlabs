@@ -1,31 +1,28 @@
-import Navbar from "@/components/Navbar";
+import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import Projects from "@/components/Projects";
+import Work from "@/components/Work";
 import Services from "@/components/Services";
-import Testimonials from "@/components/Testimonials";
-import TechStack from "@/components/TechStack";
+import Stack from "@/components/Stack";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import CursorFollower from "@/components/CursorFollower";
-import BackgroundEffects from "@/components/BackgroundEffects";
+import CursorBlob from "@/components/CursorBlob";
+import MotionConfigProvider from "@/components/MotionConfigProvider";
 
 export default function Home() {
   return (
-    <>
-      <CursorFollower />
-      <BackgroundEffects />
-      <Navbar />
-      <main className="relative z-10">
+    <MotionConfigProvider>
+      <CursorBlob />
+      <Nav />
+      <main>
         <Hero />
         <About />
-        <Projects />
+        <Work />
         <Services />
-        <Testimonials />
-        <TechStack />
+        <Stack />
         <Contact />
       </main>
       <Footer />
-    </>
+    </MotionConfigProvider>
   );
 }

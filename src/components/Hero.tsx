@@ -1,320 +1,771 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import dynamic from "next/dynamic";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  type Variants,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import AITerminal from "./AITerminal";
 
-const Scene3D = dynamic(() => import("./Scene3D"), { ssr: false });
+const headlineWords: { text: string; color: string }[] = [
+  { text: "I",          color: "var(--color-text-primary)" },
+  { text: "build",      color: "var(--color-text-primary)" },
+  { text: "AI",         color: "var(--color-accent-purple)" },
+  { text: "systems",    color: "var(--color-text-primary)" },
+  { text: "for",        color: "var(--color-text-primary)" },
+  { text: "factories,", color: "var(--color-accent-teal)" },
+  { text: "fleets,",    color: "var(--color-accent-amber)" },
+  { text: "and",        color: "var(--color-text-primary)" },
+  { text: "operations.",color: "var(--color-accent-teal)" },
+];
 
-// ─── Typewriter hook ──────────────────────────────────────────────────────────
-// Uses setInterval (not RAF) so it runs even when the tab is backgrounded.
-// Variable speed (±10 ms jitter) gives it a human feel without being slow.
+const roles = [
+  "AI systems engineer",
+  "agent builder",
+  "industrial AI dev",
+  "indie shipper",
+];
 
-function useTypewriter(
-  text: string,
-  { speed = 38, delay = 0, enabled = true }: { speed?: number; delay?: number; enabled?: boolean } = {}
-) {
-  const [count, setCount] = useState(0);
+const tickerItems = [
+  "OpenAI",
+  "Anthropic",
+  "LangChain",
+  "Pinecone",
+  "Vector DB",
+  "RAG",
+  "Agents",
+  "Fine-tuning",
+  "Vercel AI SDK",
+  "Next.js",
+  "FastAPI",
+  "PostgreSQL",
+  "Redis",
+  "Docker",
+  "ONNX",
+  "YOLOv8",
+];
 
-  useEffect(() => {
-    if (!enabled) return;
-    setCount(0);
-    let i = 0;
-    let iv: ReturnType<typeof setInterval>;
-    const t = setTimeout(() => {
-      iv = setInterval(() => {
-        i++;
-        setCount(i);
-        if (i >= text.length) clearInterval(iv);
-      }, Math.max(18, speed + (Math.random() - 0.5) * 20));
-    }, delay);
-    return () => { clearTimeout(t); clearInterval(iv); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, speed, delay, enabled]);
+const platforms = [
+  "PulseLogic",
+  "Smart Shaadi",
+  "MarksmansPro",
+  "TAPTIFS",
+  "SpaceAutoTech",
+];
 
-  return { text: text.slice(0, count), done: count >= text.length };
-}
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+};
 
-// ─── Blinking cursor ─────────────────────────────────────────────────────────
+const wordVariant: Variants = {
+  hidden: { y: "110%" },
+  show: {
+    y: "0%",
+    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
-function Cursor({ show, height = "0.85em" }: { show: boolean; height?: string }) {
-  if (!show) return null;
-  return (
-    <span
-      className="type-cursor"
-      style={{ height, width: 2 }}
-      aria-hidden="true"
-    />
-  );
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
 export default function Hero() {
-  // Parallax orbs
-  const orbX = useMotionValue(0);
-  const orbY = useMotionValue(0);
-  const springOrbX = useSpring(orbX, { stiffness: 50, damping: 30 });
-  const springOrbY = useSpring(orbY, { stiffness: 50, damping: 30 });
+  const containerRef = useRef<HTMLElement>(null);
+  const [roleIdx, setRoleIdx] = useState(0);
+
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const spx = useSpring(mx, { stiffness: 50, damping: 20 });
+  const spy = useSpring(my, { stiffness: 50, damping: 20 });
+  const orb1X = useTransform(spx, [-1, 1], [-30, 30]);
+  const orb1Y = useTransform(spy, [-1, 1], [-20, 20]);
+  const orb2X = useTransform(spx, [-1, 1], [35, -35]);
+  const orb2Y = useTransform(spy, [-1, 1], [25, -25]);
+  const panelTiltX = useTransform(spy, [-1, 1], [1.5, -1.5]);
+  const panelTiltY = useTransform(spx, [-1, 1], [-2, 2]);
 
   useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      orbX.set((e.clientX - cx) * 0.02);
-      orbY.set((e.clientY - cy) * 0.02);
+    const onMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      mx.set((e.clientX - cx) / (rect.width / 2));
+      my.set((e.clientY - cy) / (rect.height / 2));
     };
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [orbX, orbY]);
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [mx, my]);
 
-  // ── Badge text (fast, parallel) ───────────────────────────────────────────
-  const badgeLive   = useTypewriter("LIVE",   { speed: 90, delay: 80  });
-  const badgeTagline= useTypewriter("Shipping Revenue-Ready Products Since 2023", { speed: 16, delay: 180 });
-  const badgeUptime = useTypewriter("99.9% uptime", { speed: 22, delay: 260 });
-
-  // ── Headline (cascade: l1 → l2 → l3) ────────────────────────────────────
-  const l1 = "Ship Products";
-  const l2 = "That Scale Past";
-  const l3a = "Your First ";   // white
-  const l3b = "$10M";          // gradient-text-neon
-
-  const line1 = useTypewriter(l1, { speed: 40, delay: 700 });
-  const line2 = useTypewriter(l2, { speed: 38, delay: 0, enabled: line1.done });
-  const line3 = useTypewriter(l3a + l3b, { speed: 38, delay: 0, enabled: line2.done });
-
-  // Split line3 displayed text into white + neon parts
-  const l3aLen = l3a.length;
-  const line3White  = line3.text.slice(0, l3aLen);
-  const line3Accent = line3.text.slice(l3aLen);
-
-  // ── Trigger subtitle/stats after heading finishes ─────────────────────────
-  const headlineDone = line3.done;
+  useEffect(() => {
+    const interval = setInterval(
+      () => setRoleIdx((i) => (i + 1) % roles.length),
+      2500
+    );
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section className="relative min-h-[100dvh] flex flex-col items-center justify-center text-center px-6 pt-16 overflow-hidden">
-      <Scene3D />
-
-      {/* Grid texture */}
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-
-      {/* Neon radial glow behind headline */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] pointer-events-none"
+    <section
+      id="hero"
+      ref={containerRef}
+      style={{
+        minHeight: "100svh",
+        position: "relative",
+        overflow: "hidden",
+        padding: 0,
+        borderTop: "none",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+      }}
+    >
+      {/* Purple orb */}
+      <motion.div
+        aria-hidden
         style={{
-          background: "radial-gradient(ellipse at center, oklch(72% 0.22 250 / 0.055) 0%, transparent 65%)",
+          position: "absolute",
+          top: "5%",
+          left: "-12%",
+          width: "720px",
+          height: "720px",
+          background:
+            "radial-gradient(circle, rgba(6,201,168,0.18), transparent 65%)",
           filter: "blur(40px)",
+          pointerEvents: "none",
+          x: orb1X,
+          y: orb1Y,
         }}
       />
-
-      {/* Parallax orbs */}
+      {/* Teal orb */}
       <motion.div
-        className="glow-orb w-[600px] h-[400px] bg-white/[0.018] top-[-10%] left-[15%]"
-        style={{ x: springOrbX, y: springOrbY }}
-      />
-      <motion.div
-        className="glow-orb w-[500px] h-[300px] bg-white/[0.012] bottom-[10%] right-[10%]"
+        aria-hidden
         style={{
-          x: useTransform(springOrbX, (v) => -v * 1.5),
-          y: useTransform(springOrbY, (v) => -v * 1.5),
+          position: "absolute",
+          bottom: "-10%",
+          right: "-10%",
+          width: "620px",
+          height: "620px",
+          background:
+            "radial-gradient(circle, rgba(6,201,168,0.12), transparent 65%)",
+          filter: "blur(50px)",
+          pointerEvents: "none",
+          x: orb2X,
+          y: orb2Y,
         }}
       />
-      <motion.div
-        className="glow-orb w-[300px] h-[300px] bg-white/[0.008] top-[40%] right-[30%]"
+
+      <div
+        aria-hidden
         style={{
-          x: useTransform(springOrbX, (v) => v * 0.8),
-          y: useTransform(springOrbY, (v) => v * 0.8),
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, transparent, rgba(10,11,12,0.3), rgba(10,11,12,0.6))",
+          pointerEvents: "none",
+          zIndex: 1,
         }}
       />
 
-      <div className="relative z-10 max-w-[900px] w-full">
+      {/* Scan line */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          height: "1px",
+          background:
+            "linear-gradient(90deg, transparent, rgba(6,201,168,0.4), transparent)",
+          animation: "scan-line 9s linear infinite",
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      />
 
-        {/* ── Badge ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.05, ease: [0.25, 1, 0.5, 1] }}
-          whileHover={{ scale: 1.04 }}
-          className="inline-flex items-center gap-2.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-white/[0.12] bg-white/[0.04] badge-shine mb-10 backdrop-blur-sm cursor-default"
+      {/* Main */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          position: "relative",
+          zIndex: 3,
+        }}
+      >
+        <div
+          className="hero-grid"
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
+            gap: "4.5rem",
+            alignItems: "center",
+          }}
         >
-          {/* Live indicator */}
-          <span className="flex items-center gap-1.5 shrink-0">
-            <span
-              className="w-[7px] h-[7px] rounded-full bg-emerald-400 flex-shrink-0"
-              style={{ boxShadow: "0 0 10px rgba(52,211,153,0.7)", animation: "pulse-soft 2s infinite" }}
-            />
-            <span className="text-[11px] font-mono text-emerald-400/90 tracking-wider min-w-[28px] text-left">
-              {badgeLive.text}
-              <Cursor show={!badgeLive.done} height="0.7em" />
-            </span>
-          </span>
-
-          <span className="w-px h-3.5 bg-white/[0.12] shrink-0" />
-
-          {/* Tagline */}
-          <span className="text-[13px] md:text-[15px] font-mono text-white/85 tracking-wide min-w-[10ch]">
-            {badgeTagline.text}
-            <Cursor show={!badgeTagline.done} height="0.75em" />
-          </span>
-
-          <span className="w-px h-3.5 bg-white/[0.12] shrink-0 hidden sm:block" />
-
-          {/* Uptime */}
-          <span className="text-[11px] font-mono text-white/72 hidden sm:block min-w-[4ch]">
-            {badgeUptime.text}
-            <Cursor show={!badgeUptime.done} height="0.65em" />
-          </span>
-        </motion.div>
-
-        {/* ── Headline ── */}
-        <h1
-          className="kinetic-text text-[clamp(3rem,8vw,6rem)] font-display font-black leading-[0.92] tracking-[-0.05em]"
-          style={{ perspective: "800px" }}
-        >
-          {/* Line 1 */}
-          <span className="block text-white">
-            {line1.text || <span className="opacity-0">_</span>}
-            <Cursor show={!line1.done && line1.text.length > 0} height="0.75em" />
-          </span>
-
-          {/* Line 2 */}
-          <span className="block text-white/88">
-            {line2.text || <span className="opacity-0">_</span>}
-            <Cursor show={line1.done && !line2.done} height="0.75em" />
-          </span>
-
-          {/* Line 3 — split white + neon */}
-          <span className="block">
-            <span className="text-white">{line3White}</span>
-            <span className="gradient-text-neon">{line3Accent}</span>
-            <Cursor show={line2.done && !line3.done} height="0.75em" />
-            {/* Final cursor blinks a moment then fades */}
-            {line3.done && (
-              <motion.span
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0 }}
-                transition={{ delay: 1.2, duration: 0.5 }}
-                className="gradient-text-neon"
-              >
-                <Cursor show height="0.75em" />
-              </motion.span>
-            )}
-          </span>
-        </h1>
-
-        {/* ── Subtitle ── */}
-        <AnimatePresence>
-          {headlineDone && (
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-              className="mt-8 text-[17px] md:text-[20px] font-body text-white/90 max-w-[580px] mx-auto leading-[1.82]"
-            >
-              Ashwin + Mohit — an AI-native dev studio that builds agentic workflows,
-              SaaS architectures, and mobile products for startups serious about scale.
-              <span className="text-white font-medium"> 15+ products shipped. Zero missed deadlines.</span>
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {/* ── CTA buttons ── */}
-        <AnimatePresence>
-          {headlineDone && (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
-              className="mt-10 flex items-center justify-center gap-4 flex-wrap"
-            >
-              <motion.a
-                href="#projects"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                className="group relative inline-flex items-center gap-2.5 btn-neon-green btn-ripple font-semibold font-body text-[15px] px-8 py-4 rounded-xl overflow-hidden"
-              >
-                <span className="relative z-10">See What We&apos;ve Built</span>
-                <svg
-                  className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5"
-                  fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
-                >
-                  <path d="M5 12h14m-6-6l6 6-6 6" />
-                </svg>
-              </motion.a>
-              <motion.a
-                href="#contact"
-                whileHover={{
-                  scale: 1.04,
-                  backgroundColor: "rgba(255,255,255,0.06)",
-                  borderColor: "rgba(255,255,255,0.22)",
-                }}
-                whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-2 text-white/90 hover:text-white font-body text-[15px] font-medium px-7 py-4 rounded-xl border border-white/[0.16] transition-all duration-300"
-              >
-                Start a Project →
-              </motion.a>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Stats ── */}
-        <AnimatePresence>
-          {headlineDone && (
-            <div className="mt-20 flex items-center justify-center gap-4 md:gap-8 flex-wrap">
-              {[
-                { value: "15+",  label: "Products Shipped" },
-                { value: "9+",   label: "SaaS / Web" },
-                { value: "3",    label: "Mobile Apps" },
-                { value: "100%", label: "On-Time Delivery" },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 25, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: i * 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
-                  whileHover={{ y: -5, scale: 1.06 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="text-center px-5 py-4 md:px-7 md:py-5 rounded-2xl border border-white/[0.07] bg-white/[0.02] card-shadow cursor-default hover:border-white/[0.14] transition-colors duration-300"
-                >
-                  <div className="text-[28px] md:text-[38px] font-display font-bold tracking-[-0.03em] text-white">
-                    {stat.value}
-                  </div>
-                  <div className="text-[12px] md:text-[13px] font-mono text-white/72 uppercase tracking-[0.15em] mt-1">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Scroll indicator */}
-      <AnimatePresence>
-        {headlineDone && (
+          {/* LEFT */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 1 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            variants={container}
+            initial="hidden"
+            animate="show"
+            style={{ maxWidth: "820px" }}
           >
-            <span className="text-[10px] font-mono text-white/55 tracking-widest uppercase">Scroll</span>
-            <motion.div
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-[1px] h-6 bg-gradient-to-b from-white/30 to-transparent"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {/* Status pill */}
+            <motion.div variants={fadeUp} style={{ marginBottom: "2.25rem" }}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.8rem",
+                  padding: "0.4rem 0.9rem",
+                  border: "1px solid rgba(34,197,94,0.25)",
+                  background: "rgba(17,17,21,0.5)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  borderRadius: "999px",
+                }}
+              >
+                <span
+                  style={{
+                    width: "7px",
+                    height: "7px",
+                    borderRadius: "50%",
+                    background: "#22c55e",
+                    animation: "pulse-dot 2s ease-in-out infinite",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  className="text-eyebrow"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  Accepting AI projects — Q2 2026
+                </span>
+              </div>
+            </motion.div>
 
-      {/* Organic bottom edge */}
-      <div className="absolute bottom-0 inset-x-0 pointer-events-none" style={{ height: 52 }}>
-        <svg viewBox="0 0 1440 52" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="none">
-          <path d="M0 52 L0 30 Q180 8 360 24 Q540 40 720 20 Q900 2 1080 22 Q1260 40 1440 14 L1440 52 Z" fill="oklch(7% 0.005 250)" />
-        </svg>
+            {/* Headline */}
+            <motion.h1
+              variants={container}
+              className="text-h1"
+              style={{
+                marginBottom: "1.5rem",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.18em 0.28em",
+              }}
+            >
+              {headlineWords.map((w, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: "inline-block",
+                    overflow: "hidden",
+                    paddingBottom: "0.08em",
+                  }}
+                >
+                  <motion.span
+                    variants={wordVariant}
+                    style={{
+                      display: "inline-block",
+                      color: w.color,
+                    }}
+                  >
+                    {w.text}
+                  </motion.span>
+                </span>
+              ))}
+            </motion.h1>
+
+            {/* Role oscillator */}
+            <motion.div
+              variants={fadeUp}
+              className="text-subhead"
+              style={{
+                color: "var(--color-text-secondary)",
+                marginBottom: "1.75rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <span>I&apos;m an</span>
+              <span
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  minWidth: "200px",
+                  height: "1.4em",
+                  overflow: "hidden",
+                  verticalAlign: "middle",
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={roleIdx}
+                    initial={{ y: "100%", opacity: 0 }}
+                    animate={{ y: "0%", opacity: 1 }}
+                    exit={{ y: "-100%", opacity: 0 }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      color: "var(--color-accent-teal)",
+                      fontWeight: 500,
+                      letterSpacing: "var(--ls-default)",
+                    }}
+                  >
+                    {roles[roleIdx]}.
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </motion.div>
+
+            {/* Subtitle */}
+            <motion.p
+              variants={fadeUp}
+              className="text-body-lg"
+              style={{
+                color: "var(--color-text-secondary)",
+                maxWidth: "600px",
+                marginBottom: "1rem",
+                fontWeight: 400,
+              }}
+            >
+              I ship{" "}
+              <span style={{ color: "var(--color-text-primary)", fontWeight: 500 }}>
+                generative AI apps, autonomous agents, and computer-vision systems
+              </span>
+              {" "}— deployed to control rooms, ops dashboards, and customer
+              apps. Currently live: a medical AI chatbot handling clinical
+              intake and triage.
+            </motion.p>
+
+            {/* Meta */}
+            <motion.p
+              variants={fadeUp}
+              className="text-mono-sm"
+              style={{
+                color: "var(--color-text-muted)",
+                marginBottom: "2.25rem",
+              }}
+            >
+              Ashwin Hingve ·{" "}
+              <span style={{ color: "var(--color-text-secondary)" }}>Madhya Pradesh, India</span> ·
+              Remote-first
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              variants={fadeUp}
+              style={{
+                display: "flex",
+                gap: "0.85rem",
+                flexWrap: "wrap",
+                marginBottom: "3.25rem",
+              }}
+              className="hero-ctas"
+            >
+              <a
+                href="#contact"
+                className="text-mono hero-cta-primary"
+                style={{
+                  fontWeight: 500,
+                  background: "var(--color-accent-teal)",
+                  color: "var(--color-bg-primary)",
+                  padding: "1rem 1.8rem",
+                  textDecoration: "none",
+                  letterSpacing: "var(--ls-mono)",
+                  textTransform: "uppercase",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.7rem",
+                  borderRadius: "var(--radius-sm)",
+                }}
+              >
+                Start a Project
+                <span
+                  style={{
+                    display: "inline-flex",
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    background: "rgba(10,11,12,0.18)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.7rem",
+                  }}
+                >
+                  →
+                </span>
+              </a>
+              <a
+                href="#work"
+                className="text-mono hero-cta-secondary"
+                style={{
+                  fontWeight: 500,
+                  background: "transparent",
+                  color: "var(--color-text-primary)",
+                  border: "1px solid var(--color-border)",
+                  padding: "1rem 1.6rem",
+                  textDecoration: "none",
+                  letterSpacing: "var(--ls-mono)",
+                  textTransform: "uppercase",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.7rem",
+                  borderRadius: "var(--radius-sm)",
+                }}
+              >
+                See Recent Work
+                <span style={{ opacity: 0.6 }}>↓</span>
+              </a>
+            </motion.div>
+
+            {/* Trust strip */}
+            <motion.div
+              variants={fadeUp}
+              style={{
+                borderTop: "1px solid var(--color-border)",
+                paddingTop: "1.75rem",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1.5rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "16px",
+                      height: "1px",
+                      background: "var(--color-accent-teal)",
+                    }}
+                  />
+                  <span
+                    className="text-eyebrow"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    CURRENTLY IN PRODUCTION
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "1.5rem",
+                    flexWrap: "wrap",
+                    rowGap: "0.5rem",
+                  }}
+                >
+                  {platforms.map((p) => (
+                    <span
+                      key={p}
+                      className="text-mono"
+                      style={{
+                        color: "var(--color-text-primary)",
+                        fontWeight: 400,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* RIGHT: Terminal panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="hero-panel"
+            style={{
+              position: "relative",
+              rotateX: panelTiltX,
+              rotateY: panelTiltY,
+              transformPerspective: 1200,
+              transformStyle: "preserve-3d",
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: "-25%",
+                background:
+                  "radial-gradient(circle, rgba(6,201,168,0.18), transparent 60%)",
+                filter: "blur(50px)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div
+              style={{
+                position: "relative",
+                background:
+                  "linear-gradient(180deg, rgba(17,17,21,0.7), rgba(10,11,12,0.92))",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                padding: "1.25rem",
+                boxShadow: "var(--shadow-card)",
+              }}
+            >
+              {/* Header */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingBottom: "0.85rem",
+                  marginBottom: "1rem",
+                  borderBottom: "1px solid var(--color-border)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "#22c55e",
+                      animation: "pulse-dot 2s ease-in-out infinite",
+                    }}
+                  />
+                  <span
+                    className="text-eyebrow"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    agent_01 · streaming
+                  </span>
+                </div>
+                <span
+                  className="text-mono-sm"
+                  style={{ color: "var(--color-text-dim)" }}
+                >
+                  gpt-4o
+                </span>
+              </div>
+
+              {/* Terminal body */}
+              <AITerminal />
+
+              {/* Footer metrics */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: "0.5rem",
+                  paddingTop: "1rem",
+                  marginTop: "1rem",
+                  borderTop: "1px solid var(--color-border)",
+                }}
+              >
+                {[
+                  { label: "LATENCY", value: "240", unit: "ms", color: "var(--color-accent-teal)" },
+                  { label: "TOKENS", value: "1.2", unit: "K", color: "var(--color-accent-teal)" },
+                  { label: "COST", value: "$0.003", unit: "", color: "var(--color-accent-teal)" },
+                ].map((m) => (
+                  <div key={m.label}>
+                    <p
+                      className="text-eyebrow"
+                      style={{ color: "var(--color-text-dim)", marginBottom: "0.2rem" }}
+                    >
+                      {m.label}
+                    </p>
+                    <p
+                      className="text-mono"
+                      style={{
+                        fontWeight: 500,
+                        color: m.color,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {m.value}
+                      {m.unit && (
+                        <span
+                          className="text-mono-sm"
+                          style={{ color: "var(--color-text-dim)", marginLeft: "0.15rem" }}
+                        >
+                          {m.unit}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Corner brackets */}
+              <CornerBracket position="top-left" />
+              <CornerBracket position="top-right" />
+              <CornerBracket position="bottom-left" />
+              <CornerBracket position="bottom-right" />
+            </div>
+          </motion.div>
+        </div>
       </div>
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
+
+      {/* Marquee */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.2 }}
+        className="marquee-wrapper"
+        style={{
+          paddingTop: "1.5rem",
+          paddingBottom: "1.5rem",
+          borderTop: "1px solid var(--color-border)",
+          borderBottom: "1px solid var(--color-border)",
+          background:
+            "linear-gradient(180deg, transparent, rgba(17,17,21,0.4), transparent)",
+        }}
+      >
+        <div className="marquee-track">
+          {[...tickerItems, ...tickerItems].map((item, i) => (
+            <span
+              key={i}
+              className="text-h4"
+              style={{
+                color: i % 6 === 0 ? "var(--color-accent-teal)" : "var(--color-text-dim)",
+                whiteSpace: "nowrap",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "2.5rem",
+              }}
+            >
+              {item}
+              <span aria-hidden style={{ color: "var(--color-border)", fontSize: "0.7rem" }}>
+                ✦
+              </span>
+            </span>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Scroll hint */}
+      <motion.a
+        href="#about"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.8 }}
+        style={{
+          position: "absolute",
+          bottom: "1rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          zIndex: 4,
+          textDecoration: "none",
+        }}
+        className="hero-scroll-hint"
+      >
+        <span
+          className="text-eyebrow"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          scroll
+        </span>
+        <div
+          style={{
+            width: "18px",
+            height: "28px",
+            border: "1px solid var(--color-text-muted)",
+            borderRadius: "9px",
+            position: "relative",
+          }}
+        >
+          <div
+            className="scroll-hint-dot"
+            style={{
+              position: "absolute",
+              top: "5px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "2px",
+              height: "6px",
+              background: "var(--color-accent-teal)",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+      </motion.a>
     </section>
   );
+}
+
+function CornerBracket({
+  position,
+}: {
+  position: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+}) {
+  const base: React.CSSProperties = {
+    position: "absolute",
+    width: "12px",
+    height: "12px",
+    borderColor: "var(--color-accent-teal)",
+  };
+  const map: Record<string, React.CSSProperties> = {
+    "top-left": {
+      top: -6,
+      left: -6,
+      borderTop: "1.5px solid",
+      borderLeft: "1.5px solid",
+    },
+    "top-right": {
+      top: -6,
+      right: -6,
+      borderTop: "1.5px solid",
+      borderRight: "1.5px solid",
+    },
+    "bottom-left": {
+      bottom: -6,
+      left: -6,
+      borderBottom: "1.5px solid",
+      borderLeft: "1.5px solid",
+    },
+    "bottom-right": {
+      bottom: -6,
+      right: -6,
+      borderBottom: "1.5px solid",
+      borderRight: "1.5px solid",
+    },
+  };
+  return <span aria-hidden style={{ ...base, ...map[position] }} />;
 }

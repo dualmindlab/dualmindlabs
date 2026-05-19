@@ -1,34 +1,88 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Logo from "@/components/Logo";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      {/* Background accents */}
-      <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-white/[0.01] blur-[120px] pointer-events-none" />
+    <main
+      style={{
+        minHeight: "100svh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 1.5rem",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "30%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "500px",
+          height: "500px",
+          borderRadius: "50%",
+          background: "rgba(6,201,168,0.05)",
+          filter: "blur(120px)",
+          pointerEvents: "none",
+        }}
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 text-center"
+        style={{ position: "relative", zIndex: 1, textAlign: "center" }}
       >
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-          className="flex justify-center mb-8"
+          className="text-mono"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "2rem",
+            color: "var(--color-accent-teal)",
+          }}
         >
-          <Logo size={40} />
+          <span
+            aria-hidden
+            style={{
+              display: "inline-block",
+              width: "22px",
+              height: "22px",
+              border: "1.5px solid var(--color-accent-teal)",
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                inset: "3px",
+                background: "var(--color-accent-teal)",
+                opacity: 0.35,
+              }}
+            />
+          </span>
+          AH <span style={{ color: "var(--color-text-dim)" }}>/</span>{" "}
+          <span style={{ color: "var(--color-text-primary)" }}>DML</span>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-[clamp(5rem,15vw,9rem)] font-display font-black tracking-[-0.06em] leading-none gradient-text"
+          className="text-display"
+          style={{
+            color: "var(--color-text-primary)",
+            marginBottom: "1rem",
+          }}
         >
           404
         </motion.h1>
@@ -37,7 +91,13 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.5 }}
-          className="text-[16px] font-body text-white/35 mt-4 mb-8"
+          className="text-body"
+          style={{
+            color: "var(--color-text-secondary)",
+            marginBottom: "2rem",
+            maxWidth: "32ch",
+            marginInline: "auto",
+          }}
         >
           This page doesn&apos;t exist or has been moved.
         </motion.p>
@@ -47,16 +107,25 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          whileHover={{ scale: 1.04, boxShadow: "0 0 30px rgba(255,255,255,0.08)" }}
-          whileTap={{ scale: 0.96 }}
-          className="inline-flex items-center gap-2 bg-white text-black font-body font-semibold text-[14px] px-6 py-3 rounded-xl transition-all"
+          className="text-mono hero-cta-primary"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            background: "var(--color-accent-teal)",
+            color: "var(--color-bg-primary)",
+            padding: "0.95rem 1.6rem",
+            borderRadius: "var(--radius-sm)",
+            textDecoration: "none",
+            fontWeight: 500,
+            letterSpacing: "var(--ls-mono)",
+            textTransform: "uppercase",
+          }}
         >
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M19 12H5m7-7l-7 7 7 7" />
-          </svg>
+          <span aria-hidden>←</span>
           Back to Home
         </motion.a>
       </motion.div>
-    </div>
+    </main>
   );
 }

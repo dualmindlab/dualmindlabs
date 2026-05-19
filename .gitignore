@@ -50,3 +50,22 @@ turbo.json
 
 # Qodo (custom tool)
 .qodo/
+
+# Screenshot staging (temp, do not commit)
+incoming-screenshots/
+
+# Audit screenshots and visual snapshots
+audit-*.jpg
+audit-*.png
+post-*.jpg
+post-*.png
+post-fix-*.jpg
+post-typo-*.jpg
+final-*.jpg
+final-*.png
+dml-desktop-*.jpg
+*-desktop-full.jpg
+.playwright-mcp/
+
+# Internal prompt scratch
+DML_ClaudeCode_Prompt.md
