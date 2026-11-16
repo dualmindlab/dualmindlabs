@@ -30,6 +30,7 @@ const inputFocusCss = `
 export default function Contact() {
   const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   const handleCopy = async () => {
     try {
@@ -41,15 +42,41 @@ export default function Contact() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const subject = encodeURIComponent(
-      `Portfolio enquiry${form.name ? ` — ${form.name}` : ""}`
-    );
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email || "N/A"}\n\n${form.message}`
-    );
-    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+    if (status === "sending") return;
+    const fields = new FormData(e.currentTarget);
+    if (fields.get("_honey")) return;
+
+    setStatus("sending");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 20_000);
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${EMAIL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          message: form.message.trim(),
+          _subject: `Portfolio enquiry — ${form.name.trim()}`,
+          _template: "table",
+          _honey: "",
+          _url: window.location.href,
+        }),
+        signal: controller.signal,
+      });
+      const result = await response.json();
+      if (!response.ok || (result.success !== true && result.success !== "true")) {
+        throw new Error("Submission was not accepted");
+      }
+      setStatus("success");
+      setForm({ name: "", email: "", message: "" });
+    } catch {
+      setStatus("error");
+    } finally {
+      window.clearTimeout(timeout);
+    }
   };
 
   return (
@@ -212,6 +239,7 @@ export default function Contact() {
           <style>{inputFocusCss}</style>
           <form
             onSubmit={handleSubmit}
+            aria-busy={status === "sending"}
             className="contact-form"
             style={{
               display: "flex",
@@ -231,9 +259,15 @@ export default function Contact() {
             >
               SEND A MESSAGE
             </p>
+            <input type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: "none" }} />
             <FormField label="Name">
               <input
+                id="contact-name"
                 type="text"
+                name="name"
+                autoComplete="name"
+                maxLength={200}
+                disabled={status === "sending"}
                 placeholder="Your name"
                 required
                 value={form.name}
@@ -243,7 +277,12 @@ export default function Contact() {
             </FormField>
             <FormField label="Email">
               <input
+                id="contact-email"
                 type="email"
+                name="email"
+                autoComplete="email"
+                maxLength={254}
+                disabled={status === "sending"}
                 placeholder="you@company.com"
                 required
                 value={form.email}
@@ -253,6 +292,10 @@ export default function Contact() {
             </FormField>
             <FormField label="Message">
               <textarea
+                id="contact-message"
+                name="message"
+                maxLength={10000}
+                disabled={status === "sending"}
                 placeholder="A line about the role or project..."
                 required
                 rows={6}
@@ -263,6 +306,7 @@ export default function Contact() {
             </FormField>
             <button
               type="submit"
+              disabled={status === "sending"}
               className="text-mono"
               style={{
                 width: "100%",
@@ -274,7 +318,8 @@ export default function Contact() {
                 fontWeight: 500,
                 letterSpacing: "var(--ls-mono)",
                 textTransform: "uppercase",
-                cursor: "pointer",
+                cursor: status === "sending" ? "wait" : "pointer",
+                opacity: status === "sending" ? 0.7 : 1,
                 transition: "transform 200ms, box-shadow 200ms",
                 marginTop: "0.5rem",
               }}
@@ -287,8 +332,19 @@ export default function Contact() {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              Send message →
+              {status === "sending" ? "Sending…" : "Send message →"}
             </button>
+            <div role="status" aria-live="polite" className="text-body-sm">
+              {status === "success" && "Message submitted. Thanks for getting in touch!"}
+              {status === "error" && (
+                <>We couldn&apos;t confirm your submission. Your message is still here so you can retry, or <a href={`mailto:${EMAIL}`} className="link-underline" style={{ color: "var(--color-accent-teal)" }}>email me directly</a>.</>
+              )}
+            </div>
+            <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Send directly from this page — no email app needed. Your details are processed by{" "}
+              <a href="https://formsubmit.co/privacy.pdf" target="_blank" rel="noopener noreferrer" className="link-underline" style={{ color: "var(--color-accent-teal)" }}>FormSubmit</a>{" "}
+              to email your message to me.
+            </p>
           </form>
         </motion.div>
       </div>
@@ -304,8 +360,9 @@ function FormField({
   children: React.ReactNode;
 }) {
   return (
-    <label style={{ display: "block" }}>
-      <span
+    <div style={{ display: "block" }}>
+      <label
+        htmlFor={`contact-${label.toLowerCase()}`}
         className="text-eyebrow"
         style={{
           color: "var(--color-text-secondary)",
@@ -314,8 +371,8 @@ function FormField({
         }}
       >
         {label}
-      </span>
+      </label>
       {children}
-    </label>
+    </div>
   );
 }

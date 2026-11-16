@@ -96,7 +96,12 @@ test("contact links and resume use the supplied destinations", async ({ page, re
   expect((await resume.body()).subarray(0, 5).toString()).toBe("%PDF-");
 });
 
-test("contact form validates required inputs before opening an email draft", async ({ page }) => {
+test("contact form validates required inputs before submitting", async ({ page }) => {
+  let submissions = 0;
+  await page.route("https://formsubmit.co/ajax/**", async (route) => {
+    submissions++;
+    await route.fulfill({ json: { success: true } });
+  });
   const contact = page.locator("#contact");
   await contact.scrollIntoViewIfNeeded();
   await contact.getByRole("button", { name: /send message/i }).click();
@@ -107,8 +112,54 @@ test("contact form validates required inputs before opening an email draft", asy
   expect(await contact.locator("form").evaluate((form: HTMLFormElement) => form.checkValidity())).toBe(false);
   await contact.getByRole("textbox", { name: "Email", exact: true }).fill("visitor@example.com");
   expect(await contact.locator("form").evaluate((form: HTMLFormElement) => form.checkValidity())).toBe(true);
-  // Do not submit valid data: that opens the visitor's external email client.
+  expect(submissions).toBe(0);
 });
+
+test("contact form submits directly and prevents duplicate requests", async ({ page }) => {
+  const contact = page.locator("#contact");
+  let completeRequest!: () => void;
+  const pending = new Promise<void>((resolve) => { completeRequest = resolve; });
+  let submissions = 0;
+  await page.route("https://formsubmit.co/ajax/**", async (route) => {
+    submissions++;
+    expect(route.request().method()).toBe("POST");
+    expect(route.request().url()).toBe("https://formsubmit.co/ajax/ashwin.hingave123@gmail.com");
+    expect(route.request().postDataJSON()).toMatchObject({
+      name: "Portfolio visitor", email: "visitor@example.com", message: "Project enquiry & details",
+    });
+    await pending;
+    await route.fulfill({ json: { success: "true" } });
+  });
+  await contact.getByLabel("Name", { exact: true }).fill("Portfolio visitor");
+  await contact.getByRole("textbox", { name: "Email", exact: true }).fill("visitor@example.com");
+  await contact.getByLabel("Message", { exact: true }).fill("Project enquiry & details");
+  await contact.getByRole("button", { name: /send message/i }).click();
+  await expect(contact.getByRole("button", { name: "Sending…" })).toBeDisabled();
+  completeRequest();
+  await expect(contact.getByRole("status")).toContainText("Message submitted");
+  await expect(contact.getByLabel("Message", { exact: true })).toHaveValue("");
+  expect(submissions).toBe(1);
+});
+
+for (const failure of ["server", "rejected", "network"]) {
+  test(`contact form preserves the message after a ${failure} failure and allows retry`, async ({ page }) => {
+    const contact = page.locator("#contact");
+    await page.route("https://formsubmit.co/ajax/**", async (route) => {
+      if (failure === "network") return route.abort();
+      await route.fulfill({ status: failure === "server" ? 503 : 200, json: { success: false } });
+    });
+    await contact.getByLabel("Name", { exact: true }).fill("Portfolio visitor");
+    await contact.getByRole("textbox", { name: "Email", exact: true }).fill("visitor@example.com");
+    await contact.getByLabel("Message", { exact: true }).fill("Please keep this draft");
+    await contact.getByRole("button", { name: /send message/i }).click();
+    await expect(contact.getByRole("status")).toContainText("couldn't confirm");
+    await expect(contact.getByLabel("Message", { exact: true })).toHaveValue("Please keep this draft");
+    await expect(contact.getByRole("link", { name: "email me directly" })).toHaveAttribute("href", "mailto:ashwin.hingave123@gmail.com");
+    await page.route("https://formsubmit.co/ajax/**", (route) => route.fulfill({ json: { success: true } }));
+    await contact.getByRole("button", { name: /send message/i }).click();
+    await expect(contact.getByRole("status")).toContainText("Message submitted");
+  });
+}
 
 test("sharing metadata and structured profile match the portfolio", async ({ page, request }) => {
   await expect(page).toHaveTitle("Ashwin Hingve · Full-Stack Engineer");
