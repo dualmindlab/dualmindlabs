@@ -4,211 +4,254 @@ import { motion } from "framer-motion";
 import SectionLabel from "./SectionLabel";
 import ProjectMedia from "./ProjectMedia";
 
-type MediaType = "image" | "video" | "placeholder";
+type StatusKind =
+  | "LIVE"
+  | "PRE-LAUNCH"
+  | "BACKEND OFFLINE"
+  | "IN TESTING"
+  | "CLIENT DEMO";
 
-type Project = {
-  id: string;
-  num: string;
-  status: "LIVE" | "IN DEVELOPMENT" | "CURRENTLY BUILDING";
-  flagship?: boolean;
-  name: string;
-  headline: string;
-  client: string;
-  year: string;
-  url: string | null;
-  category: string;
-  problem: string;
-  built: string;
-  stack: string[];
-  accent: string;
-  media?: {
-    type: MediaType;
-    src?: string;
-    poster?: string;
-  };
+const statusMeta: Record<
+  StatusKind,
+  { color: string; border: string; bg: string; dashed: boolean }
+> = {
+  LIVE: {
+    color: "var(--color-accent-teal)",
+    border: "rgba(6,201,168,0.4)",
+    bg: "rgba(6,201,168,0.08)",
+    dashed: false,
+  },
+  "PRE-LAUNCH": {
+    color: "var(--color-accent-amber)",
+    border: "rgba(232,145,42,0.45)",
+    bg: "rgba(232,145,42,0.08)",
+    dashed: false,
+  },
+  "BACKEND OFFLINE": {
+    color: "var(--color-text-muted)",
+    border: "var(--color-text-dim)",
+    bg: "transparent",
+    dashed: true,
+  },
+  "IN TESTING": {
+    color: "var(--color-accent-purple)",
+    border: "rgba(194,164,255,0.45)",
+    bg: "rgba(194,164,255,0.08)",
+    dashed: false,
+  },
+  "CLIENT DEMO": {
+    color: "var(--color-text-secondary)",
+    border: "var(--color-border)",
+    bg: "var(--color-bg-secondary)",
+    dashed: true,
+  },
 };
 
-const projects: Project[] = [
-  {
-    id: "spaceautotech",
-    num: "01",
-    status: "LIVE",
-    name: "SpaceAutoTech WebSCADA Platform",
-    headline: "Industrial IoT & WebSCADA Platform",
-    client: "Industrial Automation",
-    year: "2024–2025",
-    url: "https://iot.spaceautotech.com",
-    category: "IoT / Full-Stack",
-    problem:
-      "Remote industrial sites needed real-time monitoring over GPRS with zero software infrastructure.",
-    built:
-      "A complete WebSCADA stack: MQTT/Sparkplug B, InfluxDB time-series, ESP32 firmware, LoRaWAN via TTN, and a live Next.js dashboard with RBAC, OMS, ticketing, and SSO.",
-    stack: [
-      "MQTT",
-      "InfluxDB",
-      "ESP32",
-      "LoRaWAN",
-      "Next.js",
-      "Node.js",
-      "PostgreSQL",
-    ],
-    accent: "var(--color-accent-teal)",
-    media: {
-      type: "image",
-      src: "/media/spaceautotech.jpg",
-    },
-  },
-  {
-    id: "marksmanspro",
-    num: "02",
-    status: "IN DEVELOPMENT",
-    name: "MarksmansPro Shooting Analysis",
-    headline: "YOLOv8 Computer Vision for Shooting Analysis",
-    client: "Defence / Sports Technology",
-    year: "2025",
-    url: "https://marksmanspro.com",
-    category: "Computer Vision",
-    problem:
-      "ISSF shooting ranges had no automated way to score targets — manual measurement was slow, inconsistent, and blocked performance analysis.",
-    built:
-      "A CV pipeline that detects bullet holes (YOLOv8 + ONNX Runtime), applies ISSF decimal scoring, analyzes shot grouping, and feeds an AI coach that builds a training plan per shooter.",
-    stack: [
-      "YOLOv8",
-      "ONNX Runtime",
-      "OpenCV",
-      "Next.js",
-      "FastAPI",
-      "PostgreSQL",
-    ],
-    accent: "var(--color-accent-teal)",
-    media: {
-      type: "image",
-      src: "/media/marksmanspro.jpg",
-    },
-  },
-  {
-    id: "pulselogic",
-    num: "03",
-    status: "LIVE",
-    flagship: true,
-    name: "PulseLogic Army Medical Platform",
-    headline: "Medical AI Platform with Clinical AI Chatbot",
-    client: "Healthcare / Defence-Adjacent",
-    year: "2024–2025",
-    url: "https://pulse-six-kappa.vercel.app",
-    category: "Medical AI",
-    problem:
-      "Medical management ran on manual records — no audit trail, no clinical decision support, and no AI-assisted triage for operators who needed fast answers.",
-    built:
-      "A full-stack medical platform with an AI symptom-triage chatbot, doctor-to-doctor messaging, X-ray and ECG analysis, a case library, RBAC admin, and billing — all live in production.",
-    stack: [
-      "Next.js",
-      "Node.js",
-      "PostgreSQL",
-      "FastAPI",
-      "OpenAI",
-      "RAG",
-      "RBAC",
-    ],
-    accent: "var(--color-accent-teal)",
-    media: {
-      type: "image",
-      src: "/media/pulselogic.jpg",
-    },
-  },
-  {
-    id: "taptifs",
-    num: "04",
-    status: "LIVE",
-    name: "TAPTIFS E-Commerce Platform",
-    headline: "Full-Stack E-Commerce Platform",
-    client: "Consumer / Food & Spices",
-    year: "2024",
-    url: "https://taptifs.com",
-    category: "Full-Stack",
-    problem:
-      "A Madhya Pradesh food & spices brand needed a full online retail presence with Indian payments and logistics infrastructure.",
-    built:
-      "Full product catalogue, SMS OTP + Google SSO, Paytm payment gateway, Shiprocket logistics, order tracking, and a complete admin dashboard.",
-    stack: [
-      "Next.js",
-      "Node.js",
-      "PostgreSQL",
-      "Paytm API",
-      "Shiprocket API",
-    ],
-    accent: "var(--color-accent-teal)",
-    media: {
-      type: "image",
-      src: "/media/taptifs.jpg",
-    },
-  },
+function StatusBadge({ status }: { status: StatusKind }) {
+  const m = statusMeta[status];
+  return (
+    <span
+      className="text-eyebrow"
+      style={{
+        padding: "0.3rem 0.6rem",
+        borderRadius: "var(--radius-sm)",
+        background: m.bg,
+        color: m.color,
+        border: `1px ${m.dashed ? "dashed" : "solid"} ${m.border}`,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.4rem",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: "5px",
+          height: "5px",
+          borderRadius: "50%",
+          background: m.color,
+          flexShrink: 0,
+        }}
+      />
+      {status}
+    </span>
+  );
+}
+
+function TagRow({ tags }: { tags: string[] }) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+      {tags.map((t) => (
+        <span
+          key={t}
+          className="text-mono-sm"
+          style={{
+            background: "var(--color-bg-primary)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-sm)",
+            padding: "0.3rem 0.6rem",
+            color: "var(--color-text-secondary)",
+          }}
+        >
+          {t}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function ProjectLink({
+  url,
+  label,
+  accent,
+}: {
+  url: string;
+  label: string;
+  accent: string;
+}) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="link-underline text-mono-sm"
+      style={{
+        color: accent,
+        textDecoration: "none",
+        letterSpacing: "var(--ls-mono)",
+        textTransform: "uppercase",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.5rem",
+      }}
+    >
+      {label} <span aria-hidden>↗</span>
+    </a>
+  );
+}
+
+// ─── Featured case studies ──────────────────────────────────────────────────
+
+type Featured = {
+  id: string;
+  num: string;
+  name: string;
+  category: string;
+  year: string;
+  status: StatusKind;
+  problem: string;
+  contribution: string;
+  implementation: string;
+  statusNote: string;
+  stack: string[];
+  link?: { url: string; label: string };
+  media:
+    | { kind: "image"; src: string; monogram: string }
+    | { kind: "detail"; monogram: string; features: string[] };
+};
+
+const featured: Featured[] = [
   {
     id: "smart-shaadi",
-    num: "05",
-    status: "CURRENTLY BUILDING",
+    num: "01",
     name: "Smart Shaadi",
-    headline: "AI-First National Matrimony Platform",
-    client: "Consumer / SaaS",
-    year: "2025–2026",
-    url: null,
-    category: "Gen AI + Web Platform",
+    category: "Matrimonial platform · Applied AI",
+    year: "2026",
+    status: "PRE-LAUNCH",
     problem:
-      "Every major matrimony platform is crippled by fake profiles, low-trust messaging, and generic matching. Users churn fast.",
-    built:
-      "Aadhaar KYC, Reciprocal Matching, Guna Milan engine, multilingual chat, vendor marketplace, escrow payments — plus 6 AI features including conversation coaching, churn prediction, and LLM-powered compatibility analysis.",
+      "Matrimonial platforms match on filters, not on how two people actually communicate or whether their families align.",
+    contribution:
+      "I built the platform end to end — profiles, authentication, chat and payment integrations — and designed and wired its AI layer.",
+    implementation:
+      "A streaming, multi-turn AI assistant with conversational memory and 13 read-only tools, backed by a provider-agnostic layer that switches between Gemini and Claude. Semantic profile re-ranking runs on 768-dimensional embeddings in PostgreSQL/pgvector. Six user-facing AI features are wired end to end — a conversation coach, a sentiment-based emotional score, an experimental compatibility-risk indicator, family-values compatibility, the streaming assistant and semantic re-ranking. Further backend/admin models (churn risk, response-rate reputation, marriage-readiness and profile optimisation) are implemented without a public UI.",
+    statusNote:
+      "Pre-launch: company registration is pending and the environment currently runs on dummy data and services ahead of commercial launch. The compatibility and risk indicators are experimental, not scientifically validated.",
     stack: [
       "Next.js",
       "FastAPI",
-      "PostgreSQL",
-      "MongoDB",
-      "Redis",
-      "Razorpay",
-      "OpenAI",
-      "React Native",
+      "PostgreSQL / pgvector",
+      "Gemini / Claude",
+      "Embeddings",
+      "Tool calling",
     ],
-    accent: "var(--color-accent-teal)",
+    link: { url: "https://smartshaadi.co.in/", label: "View beta" },
     media: {
-      type: "image",
+      kind: "image",
       src: "/media/smart-shaadi.jpg",
+      monogram: "SS",
+    },
+  },
+  {
+    id: "webscada",
+    num: "02",
+    name: "WebSCADA — SpaceAutoTech",
+    category: "Industrial IoT · WebSCADA",
+    year: "2024–2026",
+    status: "BACKEND OFFLINE",
+    problem:
+      "Industrial sites needed real-time device telemetry and browser-based monitoring without installing dedicated SCADA software.",
+    contribution:
+      "I developed the final WebSCADA implementation for SpaceAutoTech — telemetry ingestion and the browser-based monitoring dashboards.",
+    implementation:
+      "Device telemetry arrives over MQTT and is stored as time-series in InfluxDB, then surfaced through a React dashboard on a Node.js backend with device state, live dashboards and role-based access control.",
+    statusNote:
+      "The client-owned frontend remains accessible, but the backend is currently unavailable — so login and live data do not work. Shown for the implementation, not as a working demo.",
+    stack: ["MQTT", "Node.js", "React", "InfluxDB", "RBAC"],
+    link: { url: "https://iot.spaceautotech.com", label: "View frontend" },
+    media: {
+      kind: "image",
+      src: "/media/spaceautotech.jpg",
+      monogram: "WS",
+    },
+  },
+  {
+    id: "pmstore",
+    num: "03",
+    name: "PMStore",
+    category: "Pharmacy e-commerce",
+    year: "2026",
+    status: "LIVE",
+    problem:
+      "A pharmacy needed an online storefront where customers find medicines by composition and submit prescriptions, with full catalogue and order management behind it.",
+    contribution:
+      "I built and deployed the live website and its admin tooling, and developed the companion Android app.",
+    implementation:
+      "Medicine composition search, prescription upload, order management and catalogue import/export for bulk inventory — built on Next.js and Node.js with payment and order flows.",
+    statusNote:
+      "Live website. The Android app is in Google Play testing, not yet publicly launched.",
+    stack: ["Next.js", "Node.js", "PostgreSQL", "Payments"],
+    link: { url: "https://www.pratigyamedicalstore.com/", label: "Visit site" },
+    media: {
+      kind: "image",
+      src: "/media/pmstore.jpg",
+      monogram: "PM",
     },
   },
 ];
 
-function statusStyle(status: Project["status"]) {
-  if (status === "LIVE") {
-    return {
-      bg: "rgba(6,201,168,0.1)",
-      color: "var(--color-accent-teal)",
-      border: "rgba(6,201,168,0.35)",
-      solid: false,
-    };
-  }
-  if (status === "IN DEVELOPMENT") {
-    return {
-      bg: "rgba(6,201,168,0.1)",
-      color: "var(--color-accent-teal)",
-      border: "rgba(6,201,168,0.35)",
-      solid: false,
-    };
-  }
-  return {
-    bg: "transparent",
-    color: "var(--color-text-secondary)",
-    border: "var(--color-text-dim)",
-    solid: true,
-  };
+function FeatureBlock({ label, body }: { label: string; body: string }) {
+  return (
+    <div style={{ marginBottom: "1rem" }}>
+      <p
+        className="text-eyebrow"
+        style={{ color: "var(--color-text-dim)", marginBottom: "0.35rem" }}
+      >
+        {label}
+      </p>
+      <p
+        className="text-body-sm"
+        style={{ color: "var(--color-text-secondary)" }}
+      >
+        {body}
+      </p>
+    </div>
+  );
 }
 
-function ProjectRow({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) {
-  const isEven = index % 2 === 1;
-  const badge = statusStyle(project.status);
+function FeatureRow({ project, index }: { project: Featured; index: number }) {
+  const reverse = index % 2 === 1;
+  const accent = statusMeta[project.status].color;
 
   return (
     <motion.article
@@ -216,38 +259,71 @@ function ProjectRow({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`feature-strip${isEven ? " reverse" : ""}`}
-      style={{
-        paddingBottom: "1rem",
-      }}
+      className={`feature-strip${reverse ? " reverse" : ""}`}
     >
-      {/* Media */}
+      {/* Media / detail */}
       <div style={{ position: "relative" }}>
-        <ProjectMedia
-          type={project.media?.type}
-          src={project.media?.src}
-          poster={project.media?.poster}
-          alt={`${project.name} — ${project.headline}`}
-          accent={project.accent}
-          category={project.category}
-        />
-        {project.flagship && (
-          <div
-            className="text-eyebrow"
-            style={{
-              position: "absolute",
-              top: "12px",
-              left: "12px",
-              background: "rgba(232,145,42,0.12)",
-              border: "1px solid rgba(232,145,42,0.5)",
-              color: "var(--color-accent-amber)",
-              padding: "0.35rem 0.7rem",
-              borderRadius: "var(--radius-sm)",
-              backdropFilter: "blur(8px)",
-              zIndex: 2,
-            }}
-          >
-            ★ Flagship
+        {project.media.kind === "image" ? (
+          <ProjectMedia
+            type="image"
+            src={project.media.src}
+            monogram={project.media.monogram}
+            alt={`${project.name} — ${project.category}`}
+            accent={accent}
+            category={project.category}
+          />
+        ) : (
+          <div className="project-detail-panel">
+            <div
+              aria-hidden
+              style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "var(--radius-sm)",
+                border: `1px solid ${accent}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "var(--font-mono)",
+                fontWeight: 600,
+                color: accent,
+                marginBottom: "1.25rem",
+              }}
+            >
+              {project.media.monogram}
+            </div>
+            <p
+              className="text-eyebrow"
+              style={{ color: "var(--color-text-dim)", marginBottom: "1rem" }}
+            >
+              Key features
+            </p>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.7rem",
+              }}
+            >
+              {project.media.features.map((f) => (
+                <li
+                  key={f}
+                  className="text-body-sm"
+                  style={{
+                    color: "var(--color-text-primary)",
+                    display: "flex",
+                    gap: "0.6rem",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span style={{ color: accent, flexShrink: 0 }}>→</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
@@ -257,44 +333,16 @@ function ProjectRow({
         <div
           style={{
             display: "flex",
-            alignItems: "baseline",
+            alignItems: "center",
             gap: "1rem",
             marginBottom: "0.85rem",
             flexWrap: "wrap",
           }}
         >
-          <span
-            className="text-h2"
-            style={{ color: project.accent }}
-          >
+          <span className="text-h2" style={{ color: accent }}>
             {project.num}
           </span>
-          <span
-            className="text-eyebrow"
-            style={{
-              padding: "0.3rem 0.6rem",
-              borderRadius: "var(--radius-sm)",
-              background: badge.bg,
-              color: badge.color,
-              border: `1px ${badge.solid ? "dashed" : "solid"} ${badge.border}`,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.35rem",
-            }}
-          >
-            {!badge.solid && (
-              <span
-                style={{
-                  width: "5px",
-                  height: "5px",
-                  borderRadius: "50%",
-                  background: badge.color,
-                  animation: "pulse-dot 2s ease-in-out infinite",
-                }}
-              />
-            )}
-            {project.status}
-          </span>
+          <StatusBadge status={project.status} />
           <span
             className="text-mono-sm"
             style={{ color: "var(--color-text-muted)" }}
@@ -303,96 +351,174 @@ function ProjectRow({
           </span>
         </div>
 
-        <h3
-          className="text-h3"
-          style={{ marginBottom: "0.4rem" }}
-        >
+        <h3 className="text-h3" style={{ marginBottom: "1.25rem" }}>
           {project.name}
         </h3>
 
-        <p
-          className="text-body-sm"
-          style={{
-            color: project.accent,
-            marginBottom: "1rem",
-            fontWeight: 500,
-          }}
-        >
-          {project.headline}
-        </p>
+        <FeatureBlock label="Problem" body={project.problem} />
+        <FeatureBlock label="My contribution" body={project.contribution} />
+        <FeatureBlock label="Implementation" body={project.implementation} />
+        <FeatureBlock label="Current status" body={project.statusNote} />
 
-        <p
-          className="text-body-sm"
-          style={{
-            color: "var(--color-text-secondary)",
-            fontStyle: "italic",
-            marginBottom: "0.65rem",
-          }}
-        >
-          {project.problem}
-        </p>
+        <div style={{ margin: "1.25rem 0" }}>
+          <TagRow tags={project.stack} />
+        </div>
 
-        <p
-          className="text-body-sm"
-          style={{
-            color: "var(--color-text-secondary)",
-            marginBottom: "1.5rem",
-          }}
-        >
-          {project.built}
-        </p>
+        {project.link && (
+          <ProjectLink
+            url={project.link.url}
+            label={project.link.label}
+            accent="var(--color-accent-teal)"
+          />
+        )}
+      </div>
+    </motion.article>
+  );
+}
 
+// ─── Supporting projects ────────────────────────────────────────────────────
+
+type Supporting = {
+  id: string;
+  name: string;
+  category: string;
+  status: StatusKind;
+  monogram: string;
+  blurb: string;
+  stack: string[];
+  image?: string;
+  link: { url: string; label: string };
+};
+
+const supporting: Supporting[] = [
+  {
+    id: "taptifs",
+    name: "TaptiFS",
+    category: "Food e-commerce",
+    status: "LIVE",
+    monogram: "TF",
+    blurb:
+      "Live food & spices storefront built during the SpaceAutoTech engagement — authentication, Paytm payments, order tracking and a full admin dashboard.",
+    stack: ["Next.js", "Node.js", "Paytm"],
+    image: "/media/taptifs.jpg",
+    link: { url: "https://taptifs.com", label: "Visit site" },
+  },
+  {
+    id: "colonels-pickle",
+    name: "Colonel's Pickle",
+    category: "E-commerce",
+    status: "LIVE",
+    monogram: "CP",
+    blurb:
+      "Live e-commerce site with ordering, authentication and an administration dashboard.",
+    stack: ["Next.js", "Node.js", "Auth"],
+    image: "/media/colonels-pickle.jpg",
+    link: {
+      url: "https://www.colonelspicklebyridhwika.com/",
+      label: "Visit site",
+    },
+  },
+  {
+    id: "pulselogic",
+    name: "Pulse Logic",
+    category: "Client demo · Web / Android / Desktop",
+    status: "CLIENT DEMO",
+    monogram: "PL",
+    blurb:
+      "A client demonstration across web, Android and desktop: an API-based chatbot focused on medical questions. Built as a demo — not a clinical or diagnostic tool.",
+    stack: ["Next.js", "LLM APIs", "Tauri"],
+    image: "/media/pulselogic.jpg",
+    link: { url: "https://pulse-six-kappa.vercel.app", label: "View demo" },
+  },
+  {
+    id: "marksman",
+    name: "Marksman",
+    category: "Client demo · Web / Android",
+    status: "CLIENT DEMO",
+    monogram: "MK",
+    blurb:
+      "A client demonstration for web and Android: a shooting-focused AI coach with OpenCV target-hole detection and scoring.",
+    stack: ["React", "OpenCV", "React Native"],
+    image: "/media/marksmanspro.jpg",
+    link: { url: "https://marksmanspro.com", label: "View demo" },
+  },
+  {
+    id: "gulaabi-clean",
+    name: "Gulaabi Clean",
+    category: "Home-service booking",
+    status: "IN TESTING",
+    monogram: "GC",
+    blurb:
+      "A home-service booking product with separate customer and worker applications. Both apps are in testing ahead of public launch.",
+    stack: ["React Native", "Node.js"],
+    image: "/media/gulaabi-clean.jpg",
+    link: { url: "https://www.gulaabiclean.com/", label: "Visit site" },
+  },
+  {
+    id: "deployment-corner",
+    name: "Deployment Corner",
+    category: "Hiring platform",
+    status: "LIVE",
+    monogram: "DC",
+    blurb:
+      "A hiring platform with job listings, an applicant flow, a résumé builder and administration. Built during the SpaceAutoTech engagement.",
+    stack: ["Next.js", "Node.js"],
+    image: "/media/deployment-corner.jpg",
+    link: { url: "https://www.demploymentcorner.com/", label: "Visit site" },
+  },
+];
+
+function SupportingCard({ project }: { project: Supporting }) {
+  const accent = statusMeta[project.status].color;
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      className="support-card"
+    >
+      <ProjectMedia
+        type={project.image ? "image" : "placeholder"}
+        src={project.image}
+        monogram={project.monogram}
+        alt={`${project.name} — ${project.category}`}
+        accent={accent}
+        category={project.category}
+      />
+      <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", flex: 1 }}>
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: "0.4rem",
-            marginBottom: "1.5rem",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.75rem",
+            marginBottom: "0.6rem",
           }}
         >
-          {project.stack.map((tag) => (
-            <span
-              key={tag}
-              className="text-mono-sm"
-              style={{
-                background: "var(--color-bg-primary)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-sm)",
-                padding: "0.32rem 0.65rem",
-                color: "var(--color-text-secondary)",
-              }}
-            >
-              {tag}
-            </span>
-          ))}
+          <h4 className="text-h4">{project.name}</h4>
+          <StatusBadge status={project.status} />
         </div>
-
-        {project.url ? (
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-underline text-mono-sm"
-            style={{
-              color: project.accent,
-              textDecoration: "none",
-              letterSpacing: "var(--ls-mono)",
-              textTransform: "uppercase",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
-            Visit Live Site <span>↗</span>
-          </a>
-        ) : (
-          <span
-            className="text-eyebrow"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            Coming soon · Phase 1 launching
-          </span>
-        )}
+        <p
+          className="text-mono-sm"
+          style={{ color: "var(--color-text-muted)", marginBottom: "0.85rem" }}
+        >
+          {project.category}
+        </p>
+        <p
+          className="text-body-sm"
+          style={{ color: "var(--color-text-secondary)", marginBottom: "1.1rem", flex: 1 }}
+        >
+          {project.blurb}
+        </p>
+        <div style={{ marginBottom: "1.1rem" }}>
+          <TagRow tags={project.stack} />
+        </div>
+        <ProjectLink
+          url={project.link.url}
+          label={project.link.label}
+          accent="var(--color-accent-teal)"
+        />
       </div>
     </motion.article>
   );
@@ -402,45 +528,46 @@ export default function Work() {
   return (
     <section id="work">
       <div className="container">
-        <SectionLabel index="03" text="WORK" />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "end",
-            flexWrap: "wrap",
-            gap: "1.5rem",
-            marginBottom: "4rem",
-          }}
-        >
-          <div>
-            <h2 className="section-h2" style={{ maxWidth: "760px" }}>
-              Shipped systems.{" "}
-              <span style={{ color: "var(--color-accent-teal)" }}>Real production.</span>
-            </h2>
-            <p
-              className="text-mono-sm"
-              style={{
-                color: "var(--color-text-muted)",
-                marginTop: "0.75rem",
-              }}
-            >
-              Five projects across medical AI, gen AI, computer vision, IoT,
-              and e-commerce.
-            </p>
-          </div>
+        <SectionLabel index="02" text="WORK" />
+        <div style={{ marginBottom: "4rem", maxWidth: "760px" }}>
+          <h2 className="section-h2">
+            Featured{" "}
+            <span style={{ color: "var(--color-accent-teal)" }}>case studies</span>.
+          </h2>
+          <p
+            className="text-mono-sm"
+            style={{ color: "var(--color-text-muted)", marginTop: "0.75rem" }}
+          >
+            Problem → contribution → implementation → current status. Each status
+            reflects what&apos;s actually live, in testing, pre-launch or a demo.
+          </p>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "6rem",
-          }}
-        >
-          {projects.map((p, i) => (
-            <ProjectRow key={p.id} project={p} index={i} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "5.5rem" }}>
+          {featured.map((p, i) => (
+            <FeatureRow key={p.id} project={p} index={i} />
           ))}
+        </div>
+
+        {/* Supporting projects */}
+        <div style={{ marginTop: "6rem" }}>
+          <h3
+            className="text-h3"
+            style={{ marginBottom: "0.5rem" }}
+          >
+            More projects
+          </h3>
+          <p
+            className="text-mono-sm"
+            style={{ color: "var(--color-text-muted)", marginBottom: "2.5rem" }}
+          >
+            Additional client products and demonstrations.
+          </p>
+          <div className="support-grid">
+            {supporting.map((p) => (
+              <SupportingCard key={p.id} project={p} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

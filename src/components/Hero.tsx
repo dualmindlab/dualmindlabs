@@ -9,53 +9,59 @@ import {
   type Variants,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import AITerminal from "./AITerminal";
+import { RESUME_PATH } from "@/lib/site";
 
 const headlineWords: { text: string; color: string }[] = [
-  { text: "I",          color: "var(--color-text-primary)" },
-  { text: "build",      color: "var(--color-text-primary)" },
-  { text: "AI",         color: "var(--color-accent-purple)" },
-  { text: "systems",    color: "var(--color-text-primary)" },
-  { text: "for",        color: "var(--color-text-primary)" },
-  { text: "factories,", color: "var(--color-accent-teal)" },
-  { text: "fleets,",    color: "var(--color-accent-amber)" },
-  { text: "and",        color: "var(--color-text-primary)" },
-  { text: "operations.",color: "var(--color-accent-teal)" },
+  { text: "I",            color: "var(--color-text-primary)" },
+  { text: "build",        color: "var(--color-text-primary)" },
+  { text: "full-stack",   color: "var(--color-accent-teal)" },
+  { text: "web",          color: "var(--color-text-primary)" },
+  { text: "platforms",    color: "var(--color-text-primary)" },
+  { text: "and",          color: "var(--color-text-primary)" },
+  { text: "applied-AI",   color: "var(--color-accent-purple)" },
+  { text: "features.",    color: "var(--color-text-primary)" },
 ];
 
 const roles = [
-  "AI systems engineer",
-  "agent builder",
-  "industrial AI dev",
-  "indie shipper",
+  "full-stack engineer",
+  "Next.js + Node.js developer",
+  "applied-AI builder",
+  "end-to-end client delivery",
 ];
 
-const tickerItems = [
-  "OpenAI",
-  "Anthropic",
-  "LangChain",
-  "Pinecone",
-  "Vector DB",
-  "RAG",
-  "Agents",
-  "Fine-tuning",
-  "Vercel AI SDK",
-  "Next.js",
-  "FastAPI",
-  "PostgreSQL",
-  "Redis",
-  "Docker",
-  "ONNX",
-  "YOLOv8",
+type SelectedWork = {
+  name: string;
+  status: string;
+  tone: "live" | "pre" | "offline";
+  tags: string[];
+};
+
+const selectedWork: SelectedWork[] = [
+  {
+    name: "Smart Shaadi",
+    status: "Pre-launch",
+    tone: "pre",
+    tags: ["Next.js", "AI assistant", "pgvector"],
+  },
+  {
+    name: "WebSCADA",
+    status: "Frontend live · backend offline",
+    tone: "offline",
+    tags: ["MQTT", "React", "InfluxDB"],
+  },
+  {
+    name: "PMStore",
+    status: "Live",
+    tone: "live",
+    tags: ["Next.js", "Node.js", "Payments"],
+  },
 ];
 
-const platforms = [
-  "PulseLogic",
-  "Smart Shaadi",
-  "MarksmansPro",
-  "TAPTIFS",
-  "SpaceAutoTech",
-];
+const toneColor: Record<SelectedWork["tone"], string> = {
+  live: "var(--color-accent-teal)",
+  pre: "var(--color-accent-amber)",
+  offline: "var(--color-text-muted)",
+};
 
 const container: Variants = {
   hidden: {},
@@ -87,12 +93,10 @@ export default function Hero() {
   const my = useMotionValue(0);
   const spx = useSpring(mx, { stiffness: 50, damping: 20 });
   const spy = useSpring(my, { stiffness: 50, damping: 20 });
-  const orb1X = useTransform(spx, [-1, 1], [-30, 30]);
-  const orb1Y = useTransform(spy, [-1, 1], [-20, 20]);
-  const orb2X = useTransform(spx, [-1, 1], [35, -35]);
-  const orb2Y = useTransform(spy, [-1, 1], [25, -25]);
-  const panelTiltX = useTransform(spy, [-1, 1], [1.5, -1.5]);
-  const panelTiltY = useTransform(spx, [-1, 1], [-2, 2]);
+  const orb1X = useTransform(spx, [-1, 1], [-24, 24]);
+  const orb1Y = useTransform(spy, [-1, 1], [-16, 16]);
+  const orb2X = useTransform(spx, [-1, 1], [28, -28]);
+  const orb2Y = useTransform(spy, [-1, 1], [20, -20]);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -110,7 +114,7 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(
       () => setRoleIdx((i) => (i + 1) % roles.length),
-      2500
+      2800
     );
     return () => clearInterval(interval);
   }, []);
@@ -127,38 +131,37 @@ export default function Hero() {
         borderTop: "none",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "center",
       }}
     >
-      {/* Purple orb */}
+      {/* Soft ambient orbs (restrained) */}
       <motion.div
         aria-hidden
         style={{
           position: "absolute",
-          top: "5%",
+          top: "8%",
           left: "-12%",
-          width: "720px",
-          height: "720px",
+          width: "640px",
+          height: "640px",
           background:
-            "radial-gradient(circle, rgba(6,201,168,0.18), transparent 65%)",
-          filter: "blur(40px)",
+            "radial-gradient(circle, rgba(6,201,168,0.14), transparent 65%)",
+          filter: "blur(50px)",
           pointerEvents: "none",
           x: orb1X,
           y: orb1Y,
         }}
       />
-      {/* Teal orb */}
       <motion.div
         aria-hidden
         style={{
           position: "absolute",
-          bottom: "-10%",
+          bottom: "-12%",
           right: "-10%",
-          width: "620px",
-          height: "620px",
+          width: "560px",
+          height: "560px",
           background:
-            "radial-gradient(circle, rgba(6,201,168,0.12), transparent 65%)",
-          filter: "blur(50px)",
+            "radial-gradient(circle, rgba(194,164,255,0.10), transparent 65%)",
+          filter: "blur(60px)",
           pointerEvents: "none",
           x: orb2X,
           y: orb2Y,
@@ -166,39 +169,7 @@ export default function Hero() {
       />
 
       <div
-        aria-hidden
         style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, transparent, rgba(10,11,12,0.3), rgba(10,11,12,0.6))",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      />
-
-      {/* Scan line */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          height: "1px",
-          background:
-            "linear-gradient(90deg, transparent, rgba(6,201,168,0.4), transparent)",
-          animation: "scan-line 9s linear infinite",
-          pointerEvents: "none",
-          zIndex: 2,
-        }}
-      />
-
-      {/* Main */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
           width: "100%",
           position: "relative",
           zIndex: 3,
@@ -212,7 +183,7 @@ export default function Hero() {
             width: "100%",
             display: "grid",
             gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
-            gap: "4.5rem",
+            gap: "4rem",
             alignItems: "center",
           }}
         >
@@ -223,15 +194,15 @@ export default function Hero() {
             animate="show"
             style={{ maxWidth: "820px" }}
           >
-            {/* Status pill */}
-            <motion.div variants={fadeUp} style={{ marginBottom: "2.25rem" }}>
+            {/* Availability pill */}
+            <motion.div variants={fadeUp} style={{ marginBottom: "2rem" }}>
               <div
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.8rem",
+                  gap: "0.7rem",
                   padding: "0.4rem 0.9rem",
-                  border: "1px solid rgba(34,197,94,0.25)",
+                  border: "1px solid rgba(6,201,168,0.3)",
                   background: "rgba(17,17,21,0.5)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
@@ -243,8 +214,7 @@ export default function Hero() {
                     width: "7px",
                     height: "7px",
                     borderRadius: "50%",
-                    background: "#22c55e",
-                    animation: "pulse-dot 2s ease-in-out infinite",
+                    background: "var(--color-accent-teal)",
                     flexShrink: 0,
                   }}
                 />
@@ -252,7 +222,7 @@ export default function Hero() {
                   className="text-eyebrow"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
-                  Accepting AI projects — Q2 2026
+                  Open to full-stack &amp; applied-AI roles
                 </span>
               </div>
             </motion.div>
@@ -265,7 +235,7 @@ export default function Hero() {
                 marginBottom: "1.5rem",
                 display: "flex",
                 flexWrap: "wrap",
-                gap: "0.18em 0.28em",
+                gap: "0.16em 0.26em",
               }}
             >
               {headlineWords.map((w, i) => (
@@ -279,10 +249,7 @@ export default function Hero() {
                 >
                   <motion.span
                     variants={wordVariant}
-                    style={{
-                      display: "inline-block",
-                      color: w.color,
-                    }}
+                    style={{ display: "inline-block", color: w.color }}
                   >
                     {w.text}
                   </motion.span>
@@ -290,25 +257,25 @@ export default function Hero() {
               ))}
             </motion.h1>
 
-            {/* Role oscillator */}
+            {/* Role rotator */}
             <motion.div
               variants={fadeUp}
               className="text-subhead"
               style={{
                 color: "var(--color-text-secondary)",
-                marginBottom: "1.75rem",
+                marginBottom: "1.6rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
                 flexWrap: "wrap",
               }}
             >
-              <span>I&apos;m an</span>
+              <span>Ashwin Hingve —</span>
               <span
                 style={{
                   position: "relative",
                   display: "inline-block",
-                  minWidth: "200px",
+                  minWidth: "250px",
                   height: "1.4em",
                   overflow: "hidden",
                   verticalAlign: "middle",
@@ -346,42 +313,41 @@ export default function Hero() {
                 fontWeight: 400,
               }}
             >
-              I ship{" "}
+              I turn client requirements into shipped software — owning{" "}
               <span style={{ color: "var(--color-text-primary)", fontWeight: 500 }}>
-                generative AI apps, autonomous agents, and computer-vision systems
+                architecture, development, integrations and deployment
               </span>
-              {" "}— deployed to control rooms, ops dashboards, and customer
-              apps. Currently live: a medical AI chatbot handling clinical
-              intake and triage.
+              . Experience across e-commerce, matrimonial platforms and
+              industrial IoT, with AI features built on LLM APIs, tool calling,
+              semantic search and OpenCV.
             </motion.p>
 
             {/* Meta */}
             <motion.p
               variants={fadeUp}
               className="text-mono-sm"
-              style={{
-                color: "var(--color-text-muted)",
-                marginBottom: "2.25rem",
-              }}
+              style={{ color: "var(--color-text-muted)", marginBottom: "2.25rem" }}
             >
-              Ashwin Hingve ·{" "}
-              <span style={{ color: "var(--color-text-secondary)" }}>Madhya Pradesh, India</span> ·
-              Remote-first
+              Bhopal, India ·{" "}
+              <span style={{ color: "var(--color-text-secondary)" }}>
+                Remote &amp; on-site
+              </span>{" "}
+              · TypeScript · Next.js · Node.js · Applied AI
             </motion.p>
 
             {/* CTAs */}
             <motion.div
               variants={fadeUp}
+              className="hero-ctas"
               style={{
                 display: "flex",
                 gap: "0.85rem",
                 flexWrap: "wrap",
-                marginBottom: "3.25rem",
+                alignItems: "center",
               }}
-              className="hero-ctas"
             >
               <a
-                href="#contact"
+                href="#work"
                 className="text-mono hero-cta-primary"
                 style={{
                   fontWeight: 500,
@@ -393,28 +359,16 @@ export default function Hero() {
                   textTransform: "uppercase",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.7rem",
+                  gap: "0.6rem",
                   borderRadius: "var(--radius-sm)",
                 }}
               >
-                Start a Project
-                <span
-                  style={{
-                    display: "inline-flex",
-                    width: "16px",
-                    height: "16px",
-                    borderRadius: "50%",
-                    background: "rgba(10,11,12,0.18)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "0.7rem",
-                  }}
-                >
-                  →
-                </span>
+                View projects <span aria-hidden>↓</span>
               </a>
               <a
-                href="#work"
+                href={RESUME_PATH}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-mono hero-cta-secondary"
                 style={{
                   fontWeight: 500,
@@ -427,100 +381,43 @@ export default function Hero() {
                   textTransform: "uppercase",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.7rem",
+                  gap: "0.6rem",
                   borderRadius: "var(--radius-sm)",
                 }}
               >
-                See Recent Work
-                <span style={{ opacity: 0.6 }}>↓</span>
+                Résumé <span aria-hidden>↗</span>
               </a>
-            </motion.div>
-
-            {/* Trust strip */}
-            <motion.div
-              variants={fadeUp}
-              style={{
-                borderTop: "1px solid var(--color-border)",
-                paddingTop: "1.75rem",
-              }}
-            >
-              <div
+              <a
+                href="#contact"
+                className="link-underline text-mono-sm"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1.5rem",
-                  flexWrap: "wrap",
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  letterSpacing: "var(--ls-mono)",
+                  textTransform: "uppercase",
+                  padding: "0.5rem 0.25rem",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.6rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: "16px",
-                      height: "1px",
-                      background: "var(--color-accent-teal)",
-                    }}
-                  />
-                  <span
-                    className="text-eyebrow"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
-                    CURRENTLY IN PRODUCTION
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "1.5rem",
-                    flexWrap: "wrap",
-                    rowGap: "0.5rem",
-                  }}
-                >
-                  {platforms.map((p) => (
-                    <span
-                      key={p}
-                      className="text-mono"
-                      style={{
-                        color: "var(--color-text-primary)",
-                        fontWeight: 400,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                Contact
+              </a>
             </motion.div>
           </motion.div>
 
-          {/* RIGHT: Terminal panel */}
+          {/* RIGHT: Selected-work board (honest) */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="hero-panel"
-            style={{
-              position: "relative",
-              rotateX: panelTiltX,
-              rotateY: panelTiltY,
-              transformPerspective: 1200,
-              transformStyle: "preserve-3d",
-            }}
+            style={{ position: "relative" }}
           >
             <div
               aria-hidden
               style={{
                 position: "absolute",
-                inset: "-25%",
+                inset: "-20%",
                 background:
-                  "radial-gradient(circle, rgba(6,201,168,0.18), transparent 60%)",
+                  "radial-gradient(circle, rgba(6,201,168,0.12), transparent 60%)",
                 filter: "blur(50px)",
                 pointerEvents: "none",
               }}
@@ -530,162 +427,137 @@ export default function Hero() {
               style={{
                 position: "relative",
                 background:
-                  "linear-gradient(180deg, rgba(17,17,21,0.7), rgba(10,11,12,0.92))",
+                  "linear-gradient(180deg, rgba(17,17,21,0.75), rgba(10,11,12,0.92))",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-md)",
                 backdropFilter: "blur(16px)",
                 WebkitBackdropFilter: "blur(16px)",
-                padding: "1.25rem",
+                padding: "1.5rem",
                 boxShadow: "var(--shadow-card)",
               }}
             >
-              {/* Header */}
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  paddingBottom: "0.85rem",
-                  marginBottom: "1rem",
+                  paddingBottom: "1rem",
+                  marginBottom: "1.1rem",
                   borderBottom: "1px solid var(--color-border)",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
+                <span
+                  className="text-eyebrow"
+                  style={{ color: "var(--color-text-secondary)" }}
                 >
-                  <span
-                    style={{
-                      width: "6px",
-                      height: "6px",
-                      borderRadius: "50%",
-                      background: "#22c55e",
-                      animation: "pulse-dot 2s ease-in-out infinite",
-                    }}
-                  />
-                  <span
-                    className="text-eyebrow"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
-                    agent_01 · streaming
-                  </span>
-                </div>
+                  Selected work
+                </span>
                 <span
                   className="text-mono-sm"
                   style={{ color: "var(--color-text-dim)" }}
                 >
-                  gpt-4o
+                  2024 — 2026
                 </span>
               </div>
 
-              {/* Terminal body */}
-              <AITerminal />
-
-              {/* Footer metrics */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "0.5rem",
-                  paddingTop: "1rem",
-                  marginTop: "1rem",
-                  borderTop: "1px solid var(--color-border)",
-                }}
-              >
-                {[
-                  { label: "LATENCY", value: "240", unit: "ms", color: "var(--color-accent-teal)" },
-                  { label: "TOKENS", value: "1.2", unit: "K", color: "var(--color-accent-teal)" },
-                  { label: "COST", value: "$0.003", unit: "", color: "var(--color-accent-teal)" },
-                ].map((m) => (
-                  <div key={m.label}>
-                    <p
-                      className="text-eyebrow"
-                      style={{ color: "var(--color-text-dim)", marginBottom: "0.2rem" }}
-                    >
-                      {m.label}
-                    </p>
-                    <p
-                      className="text-mono"
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                {selectedWork.map((w) => (
+                  <div
+                    key={w.name}
+                    style={{
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                      padding: "0.9rem 1rem",
+                      background: "rgba(10,11,12,0.4)",
+                    }}
+                  >
+                    <div
                       style={{
-                        fontWeight: 500,
-                        color: m.color,
-                        lineHeight: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "0.75rem",
+                        marginBottom: "0.6rem",
                       }}
                     >
-                      {m.value}
-                      {m.unit && (
+                      <span
+                        className="text-body-sm"
+                        style={{ color: "var(--color-text-primary)", fontWeight: 600 }}
+                      >
+                        {w.name}
+                      </span>
+                      <span
+                        className="text-eyebrow"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.4rem",
+                          color: toneColor[w.tone],
+                          whiteSpace: "nowrap",
+                        }}
+                      >
                         <span
+                          style={{
+                            width: "6px",
+                            height: "6px",
+                            borderRadius: "50%",
+                            background: toneColor[w.tone],
+                            flexShrink: 0,
+                          }}
+                        />
+                        {w.status}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+                      {w.tags.map((t) => (
+                        <span
+                          key={t}
                           className="text-mono-sm"
-                          style={{ color: "var(--color-text-dim)", marginLeft: "0.15rem" }}
+                          style={{
+                            fontSize: "0.72rem",
+                            background: "var(--color-bg-primary)",
+                            border: "1px solid var(--color-border)",
+                            borderRadius: "var(--radius-sm)",
+                            padding: "0.2rem 0.5rem",
+                            color: "var(--color-text-secondary)",
+                          }}
                         >
-                          {m.unit}
+                          {t}
                         </span>
-                      )}
-                    </p>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* Corner brackets */}
-              <CornerBracket position="top-left" />
-              <CornerBracket position="top-right" />
-              <CornerBracket position="bottom-left" />
-              <CornerBracket position="bottom-right" />
+              <a
+                href="#work"
+                className="link-underline text-eyebrow"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  marginTop: "1.2rem",
+                  color: "var(--color-accent-teal)",
+                  textDecoration: "none",
+                }}
+              >
+                See all projects <span aria-hidden>→</span>
+              </a>
             </div>
           </motion.div>
         </div>
       </div>
-
-      {/* Marquee */}
-      <motion.div
-        aria-hidden="true"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.2 }}
-        className="marquee-wrapper"
-        style={{
-          paddingTop: "1.5rem",
-          paddingBottom: "1.5rem",
-          borderTop: "1px solid var(--color-border)",
-          borderBottom: "1px solid var(--color-border)",
-          background:
-            "linear-gradient(180deg, transparent, rgba(17,17,21,0.4), transparent)",
-        }}
-      >
-        <div className="marquee-track">
-          {[...tickerItems, ...tickerItems].map((item, i) => (
-            <span
-              key={i}
-              className="text-h4"
-              style={{
-                color: i % 6 === 0 ? "var(--color-accent-teal)" : "var(--color-text-dim)",
-                whiteSpace: "nowrap",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "2.5rem",
-              }}
-            >
-              {item}
-              <span aria-hidden style={{ color: "var(--color-border)", fontSize: "0.7rem" }}>
-                ✦
-              </span>
-            </span>
-          ))}
-        </div>
-      </motion.div>
 
       {/* Scroll hint */}
       <motion.a
         href="#about"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.8 }}
+        transition={{ duration: 0.8, delay: 1.4 }}
         style={{
           position: "absolute",
-          bottom: "1rem",
+          bottom: "1.5rem",
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",
@@ -695,11 +567,9 @@ export default function Hero() {
           textDecoration: "none",
         }}
         className="hero-scroll-hint"
+        aria-label="Scroll to about section"
       >
-        <span
-          className="text-eyebrow"
-          style={{ color: "var(--color-text-muted)" }}
-        >
+        <span className="text-eyebrow" style={{ color: "var(--color-text-muted)" }}>
           scroll
         </span>
         <div
@@ -728,44 +598,4 @@ export default function Hero() {
       </motion.a>
     </section>
   );
-}
-
-function CornerBracket({
-  position,
-}: {
-  position: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-}) {
-  const base: React.CSSProperties = {
-    position: "absolute",
-    width: "12px",
-    height: "12px",
-    borderColor: "var(--color-accent-teal)",
-  };
-  const map: Record<string, React.CSSProperties> = {
-    "top-left": {
-      top: -6,
-      left: -6,
-      borderTop: "1.5px solid",
-      borderLeft: "1.5px solid",
-    },
-    "top-right": {
-      top: -6,
-      right: -6,
-      borderTop: "1.5px solid",
-      borderRight: "1.5px solid",
-    },
-    "bottom-left": {
-      bottom: -6,
-      left: -6,
-      borderBottom: "1.5px solid",
-      borderLeft: "1.5px solid",
-    },
-    "bottom-right": {
-      bottom: -6,
-      right: -6,
-      borderBottom: "1.5px solid",
-      borderRight: "1.5px solid",
-    },
-  };
-  return <span aria-hidden style={{ ...base, ...map[position] }} />;
 }

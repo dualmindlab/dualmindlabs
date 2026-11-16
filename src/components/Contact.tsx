@@ -3,17 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import SectionLabel from "./SectionLabel";
-
-const EMAIL = "ashwin.hingave123@gmail.com";
-
-const budgetOptions = [
-  { value: "", label: "Select a range...", disabled: true },
-  { value: "<1L", label: "< ₹1 Lakh" },
-  { value: "1-5L", label: "₹1L – ₹5L" },
-  { value: "5-20L", label: "₹5L – ₹20L" },
-  { value: "20L+", label: "₹20L+" },
-  { value: "discuss", label: "Let's discuss" },
-];
+import SocialLinks from "./SocialLinks";
+import { EMAIL } from "@/lib/site";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -30,8 +21,7 @@ const inputStyle: React.CSSProperties = {
 
 const inputFocusCss = `
   .contact-form input:focus,
-  .contact-form textarea:focus,
-  .contact-form select:focus {
+  .contact-form textarea:focus {
     border-color: var(--color-accent-teal);
     outline: none;
   }
@@ -39,12 +29,7 @@ const inputFocusCss = `
 
 export default function Contact() {
   const [copied, setCopied] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    company: "",
-    description: "",
-    budget: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   const handleCopy = async () => {
     try {
@@ -59,17 +44,16 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const subject = encodeURIComponent(
-      `Project Enquiry${form.company ? ` — ${form.company}` : ""}`
+      `Portfolio enquiry${form.name ? ` — ${form.name}` : ""}`
     );
     const body = encodeURIComponent(
-      `Name: ${form.name}\nCompany: ${form.company || "N/A"}\nBudget: ${form.budget || "N/A"}\n\n${form.description}`
+      `Name: ${form.name}\nEmail: ${form.email || "N/A"}\n\n${form.message}`
     );
     window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
   };
 
   return (
-    <section id="contact" style={{ position: "relative" }}>
-      {/* Backdrop glow */}
+    <section id="contact" style={{ position: "relative", overflow: "hidden" }}>
       <div
         aria-hidden
         style={{
@@ -87,7 +71,7 @@ export default function Contact() {
       />
 
       <div className="container" style={{ position: "relative" }}>
-        <SectionLabel index="06" text="CONTACT" />
+        <SectionLabel index="05" text="CONTACT" />
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -96,8 +80,8 @@ export default function Contact() {
           className="section-h2"
           style={{ marginBottom: "3rem" }}
         >
-          Got a project?{" "}
-          <span style={{ color: "var(--color-accent-teal)" }}>Let&apos;s talk.</span>
+          Let&apos;s{" "}
+          <span style={{ color: "var(--color-accent-teal)" }}>work together</span>.
         </motion.h2>
 
         <motion.div
@@ -117,18 +101,12 @@ export default function Contact() {
                 marginBottom: "2.5rem",
               }}
             >
-              I work with founders, operators, and engineering teams who need
-              real software built — not wireframes, not decks.
+              I&apos;m open to full-stack and applied-AI roles — remote or
+              on-site — and to freelance projects.
               <br />
               <br />
-              Industrial IoT systems, computer vision pipelines, full-stack
-              SaaS platforms — if the problem is real, I want to hear about it.
-              <br />
-              <br />
-              Most projects start with a scoping call.{" "}
-              <span style={{ color: "var(--color-text-primary)" }}>
-                No retainer required to explore.
-              </span>
+              If you&apos;re hiring or have something you want built, send a note
+              with a few details and I&apos;ll get back to you.
             </p>
 
             {/* Email card */}
@@ -164,6 +142,7 @@ export default function Contact() {
                     fontSize: "var(--text-body)",
                     color: "var(--color-accent-teal)",
                     textDecoration: "none",
+                    wordBreak: "break-all",
                   }}
                 >
                   {EMAIL}
@@ -172,9 +151,9 @@ export default function Contact() {
                   onClick={handleCopy}
                   className="text-eyebrow"
                   style={{
-                    color: copied ? "#22c55e" : "var(--color-text-secondary)",
+                    color: copied ? "var(--color-accent-success)" : "var(--color-text-secondary)",
                     background: "transparent",
-                    border: `1px solid ${copied ? "#22c55e" : "var(--color-border)"}`,
+                    border: `1px solid ${copied ? "var(--color-accent-success)" : "var(--color-border)"}`,
                     borderRadius: "var(--radius-sm)",
                     padding: "0.5rem 0.85rem",
                     cursor: "pointer",
@@ -201,13 +180,13 @@ export default function Contact() {
               }}
             >
               <span
+                aria-hidden
                 style={{
                   width: "10px",
                   height: "10px",
                   borderRadius: "50%",
-                  background: "#22c55e",
+                  background: "var(--color-accent-success)",
                   flexShrink: 0,
-                  animation: "pulse-dot 2s ease-in-out infinite",
                 }}
               />
               <div>
@@ -226,28 +205,7 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Social */}
-            <div style={{ display: "flex", gap: "0.75rem" }}>
-              <SocialIcon
-                href="https://github.com/ashwinhingve"
-                label="GitHub"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                </svg>
-              </SocialIcon>
-              <SocialIcon href="https://www.linkedin.com/in/ashwinhingve" label="LinkedIn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                </svg>
-              </SocialIcon>
-              <SocialIcon href={`mailto:${EMAIL}`} label="Email">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <rect x="2" y="4" width="20" height="16" rx="1" />
-                  <path d="M2 6l10 8 10-8" />
-                </svg>
-              </SocialIcon>
-            </div>
+            <SocialLinks includeEmail />
           </div>
 
           {/* Right: form */}
@@ -264,13 +222,14 @@ export default function Contact() {
               border: "1px solid var(--color-border)",
               borderRadius: "var(--radius-md)",
               boxShadow: "var(--shadow-card)",
+              height: "fit-content",
             }}
           >
             <p
               className="text-eyebrow"
               style={{ color: "var(--color-text-dim)", marginBottom: "0.5rem" }}
             >
-              PROJECT ENQUIRY
+              SEND A MESSAGE
             </p>
             <FormField label="Name">
               <input
@@ -282,53 +241,25 @@ export default function Contact() {
                 style={inputStyle}
               />
             </FormField>
-            <FormField label="Company (optional)">
+            <FormField label="Email">
               <input
-                type="text"
-                placeholder="Company name"
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                type="email"
+                placeholder="you@company.com"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 style={inputStyle}
               />
             </FormField>
-            <FormField label="What are you building?">
+            <FormField label="Message">
               <textarea
-                placeholder="Describe the problem and the system you want built..."
+                placeholder="A line about the role or project..."
                 required
-                rows={5}
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
+                rows={6}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
                 style={{ ...inputStyle, resize: "vertical" }}
               />
-            </FormField>
-            <FormField label="Budget range">
-              <select
-                value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                style={{
-                  ...inputStyle,
-                  appearance: "none",
-                  cursor: "pointer",
-                  color: form.budget ? "var(--color-text-primary)" : "var(--color-text-dim)",
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%238A8A9A' stroke-width='1.2'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 1rem center",
-                }}
-              >
-                {budgetOptions.map((o) => (
-                  <option
-                    key={o.value}
-                    value={o.value}
-                    disabled={o.disabled}
-                    style={{ background: "var(--color-bg-secondary)" }}
-                  >
-                    {o.label}
-                  </option>
-                ))}
-              </select>
             </FormField>
             <button
               type="submit"
@@ -356,7 +287,7 @@ export default function Contact() {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              SEND MESSAGE →
+              Send message →
             </button>
           </form>
         </motion.div>
@@ -386,47 +317,5 @@ function FormField({
       </span>
       {children}
     </label>
-  );
-}
-
-function SocialIcon({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      target={href.startsWith("http") ? "_blank" : undefined}
-      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-      aria-label={label}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "44px",
-        height: "44px",
-        background: "var(--color-bg-secondary)",
-        border: "1px solid var(--color-border)",
-        color: "var(--color-text-secondary)",
-        transition: "color 150ms, border-color 150ms, transform 150ms",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = "var(--color-accent-teal)";
-        e.currentTarget.style.borderColor = "var(--color-accent-teal)";
-        e.currentTarget.style.transform = "translateY(-2px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = "var(--color-text-secondary)";
-        e.currentTarget.style.borderColor = "var(--color-border)";
-        e.currentTarget.style.transform = "translateY(0)";
-      }}
-    >
-      {children}
-    </a>
   );
 }

@@ -29,7 +29,7 @@ export default defineConfig({
 
   /* ── Global browser context defaults ── */
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3100",
 
     /* Capture a full trace ZIP on the first retry — includes DOM snapshots,
        network logs, and step-level screenshots for every failure. */
@@ -87,15 +87,16 @@ export default defineConfig({
 
   /* ── Dev server ── */
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: "npm run dev -- --port 3100",
+    env: { NEXT_DIST_DIR: ".next-playwright" },
+    url: "http://localhost:3100",
 
     /* Reuse a running dev server locally so `npx playwright test` doesn't
        restart Next.js on every run.  Always cold-start on CI. */
     reuseExistingServer: !process.env.CI,
 
-    /* Next.js 15 cold-start (with Turbopack) can take ~30 s on first compile. */
-    timeout: 120_000,
+    /* Allow cold compilation on slower mounted workspaces. */
+    timeout: 300_000,
   },
 
   /* Screenshot artifacts */

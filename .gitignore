@@ -69,3 +69,9 @@ dml-desktop-*.jpg
 
 # Internal prompt scratch
 DML_ClaudeCode_Prompt.md
+
+# Playwright reports
+playwright-report/
+test-results/
+
+.next-playwright/

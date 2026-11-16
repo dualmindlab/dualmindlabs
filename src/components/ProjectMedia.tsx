@@ -12,6 +12,7 @@ interface ProjectMediaProps {
   alt: string;
   accent?: string;
   category?: string;
+  monogram?: string;
   aspectRatio?: string;
 }
 
@@ -22,6 +23,7 @@ export default function ProjectMedia({
   alt,
   accent = "var(--color-accent-teal)",
   category,
+  monogram,
   aspectRatio = "16 / 10",
 }: ProjectMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -81,7 +83,7 @@ export default function ProjectMedia({
       )}
 
       {showPlaceholder && (
-        <Placeholder accent={accent} category={category} />
+        <Placeholder accent={accent} category={category} monogram={monogram} />
       )}
 
       {/* Corner brackets for framing */}
@@ -118,45 +120,53 @@ export default function ProjectMedia({
 function Placeholder({
   accent,
   category,
+  monogram,
 }: {
   accent: string;
   category?: string;
+  monogram?: string;
 }) {
   return (
     <div className="project-media__placeholder">
-      <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "0.75rem",
+          padding: "1rem",
+        }}
+      >
+        {monogram && (
+          <div
+            aria-hidden
+            style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "var(--radius-sm)",
+              border: `1px solid ${accent}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--font-mono)",
+              fontWeight: 600,
+              fontSize: "1.25rem",
+              letterSpacing: "0.04em",
+              color: accent,
+              background: "rgba(10,11,12,0.4)",
+            }}
+          >
+            {monogram}
+          </div>
+        )}
         <div
-          className="text-eyebrow"
-          style={{ color: "var(--color-text-dim)", marginBottom: "0.5rem" }}
-        >
-          MEDIA PLACEHOLDER
-        </div>
-        <div
-          className="text-body-lg"
+          className="text-body-sm"
           style={{ fontWeight: 500, color: "var(--color-text-secondary)" }}
         >
-          {category || "Project Showcase"}
-        </div>
-        <div
-          className="text-eyebrow"
-          style={{
-            marginTop: "1rem",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            color: accent,
-          }}
-        >
-          <span
-            style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              background: accent,
-              boxShadow: `0 0 12px ${accent}`,
-            }}
-          />
-          image / video slot
+          {category || "Project"}
         </div>
       </div>
     </div>

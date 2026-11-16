@@ -1,36 +1,31 @@
-# Project Media
+# Project media
 
-Drop your project images and videos here. Files are referenced by the `id` field in `src/components/Work.tsx`.
+Screenshots are connected in `src/components/Work.tsx`. The portrait is used in
+`src/components/About.tsx`. The dedicated sharing image is configured in
+`src/app/layout.tsx`.
 
-## Expected Files
+| Asset | Used for |
+|---|---|
+| `ashwin.jpg` | About portrait |
+| `og-image.jpg` | Open Graph and Twitter sharing preview (1200×630) |
+| `smart-shaadi.jpg` | Smart Shaadi (featured) |
+| `spaceautotech.jpg` | WebSCADA / SpaceAutoTech (featured) |
+| `pmstore.jpg` | PMStore (featured) |
+| `taptifs.jpg` | TaptiFS |
+| `colonels-pickle.jpg` | Colonel's Pickle |
+| `pulselogic.jpg` | Pulse Logic |
+| `marksmanspro.jpg` | Marksman |
+| `gulaabi-clean.jpg` | Gulaabi Clean |
+| `deployment-corner.jpg` | Deployment Corner |
 
-| Project | Video (preferred) | Image fallback |
-|---|---|---|
-| PulseLogic | `pulselogic.mp4` | `pulselogic.jpg` |
-| Smart Shaadi | `smart-shaadi.mp4` | `smart-shaadi.jpg` |
-| MarksmansPro | `marksmanspro.mp4` | `marksmanspro.jpg` |
-| SpaceAutoTech | `spaceautotech.mp4` | `spaceautotech.jpg` |
-| TAPTIFS | `taptifs.mp4` | `taptifs.jpg` |
+## Dedicated sharing image
 
-## Recommendations
+`og-image.jpg` is the 1200×630 landscape card used for both Open Graph and
+Twitter link previews. If replacing it, retain the filename and dimensions.
+The About section continues to use `ashwin.jpg`.
 
-**Videos (`.mp4`):**
-- Resolution: 1280×800 or 1600×1000 (16:10 aspect ratio)
-- Duration: 8–15 seconds, loopable
-- Encoding: H.264, 2–4 Mbps bitrate
-- Size target: ≤ 3 MB per clip
-- **Must be muted** — they autoplay
-- No sound, no intro frames, no captions
+## Screenshots
 
-**Images (`.jpg` or `.png`):**
-- Resolution: 1600×1000 at minimum
-- JPEG quality 80–85 for small files
-- Also serves as video poster (same filename, `.jpg` extension)
-
-## Posters
-
-For every video, include a matching `.jpg` of the first frame with the same basename — it shows while the video loads.
-
-## No Files?
-
-If a project has no media, the `ProjectMedia` component renders a branded gradient placeholder with the project category label. Nothing breaks.
+The display frames are 16:10 and crop images to fill. For future replacements,
+use a matching crop and JPEG quality 80–85. Images are served without automatic
+optimization because this site uses Next.js static export.

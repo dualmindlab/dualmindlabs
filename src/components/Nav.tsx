@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import { RESUME_PATH } from "@/lib/site";
 
 const links = [
   { href: "#about", label: "About" },
   { href: "#work", label: "Work" },
-  { href: "#services", label: "Services" },
-  { href: "#stack", label: "Stack" },
+  { href: "#experience", label: "Experience" },
+  { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -178,7 +179,9 @@ export default function Nav() {
 
           {/* CTA */}
           <a
-            href="#contact"
+            href={RESUME_PATH}
+            target="_blank"
+            rel="noopener noreferrer"
             className="hidden md:inline-flex text-mono-sm hero-cta-primary"
             style={{
               fontWeight: 500,
@@ -193,7 +196,7 @@ export default function Nav() {
               gap: "0.4rem",
             }}
           >
-            Start a Project <span>→</span>
+            Résumé <span aria-hidden>↗</span>
           </a>
 
           {/* Hamburger */}
@@ -262,7 +265,9 @@ export default function Nav() {
               </a>
             ))}
             <a
-              href="#contact"
+              href={RESUME_PATH}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMobileOpen(false)}
               className="text-mono"
               style={{
@@ -278,7 +283,7 @@ export default function Nav() {
                 textAlign: "center",
               }}
             >
-              Start a Project →
+              Résumé ↗
             </a>
           </motion.div>
         )}

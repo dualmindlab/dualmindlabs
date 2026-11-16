@@ -4,14 +4,18 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import SectionLabel from "./SectionLabel";
 
-const chips = ["AI + Industrial", "4+ Years Shipping", "Solo Practice"] as const;
+const chips = [
+  "Client delivery",
+  "TypeScript · Next.js · Node.js",
+  "Applied AI · OpenCV",
+] as const;
 
 export default function About() {
   return (
     <section id="about">
       <div className="container">
         <div style={{ maxWidth: "900px", marginBottom: "4rem" }}>
-          <SectionLabel index="02" text="ABOUT" />
+          <SectionLabel index="01" text="ABOUT" />
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -19,7 +23,7 @@ export default function About() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="section-h2"
           >
-            One engineer. Real work.
+            One engineer, end to end.
           </motion.h2>
         </div>
 
@@ -132,7 +136,7 @@ export default function About() {
                   className="text-eyebrow"
                   style={{ color: "var(--color-text-dim)" }}
                 >
-                  AI Systems Engineer · IND
+                  Full-Stack Engineer · Bhopal, India
                 </span>
               </div>
 
@@ -178,7 +182,7 @@ export default function About() {
                 fontWeight: 500,
               }}
             >
-              I build AI systems that hold up in production.
+              I&apos;m a full-stack developer who owns projects end to end.
             </p>
             <p
               className="text-body"
@@ -188,13 +192,13 @@ export default function About() {
                 maxWidth: "580px",
               }}
             >
-              Generative AI apps, autonomous agents, and full-stack web
-              platforms — delivered solo, end to end. Currently live:{" "}
+              I translate client requirements into scoped applications and take
+              them from{" "}
               <span style={{ color: "var(--color-accent-teal)" }}>
-                a medical AI chatbot
-              </span>{" "}
-              handling clinical intake and triage for an army medical
-              operation.
+                architecture through development, integrations and deployment
+              </span>
+              . My work spans e-commerce storefronts, a matrimonial platform and
+              industrial IoT monitoring.
             </p>
             <p
               className="text-body-sm"
@@ -204,10 +208,11 @@ export default function About() {
                 maxWidth: "580px",
               }}
             >
-              I started without formal training, driven by a need to build
-              things that actually worked in the real world. Based in Madhya
-              Pradesh, India. Remote-first. I also ship industrial IoT and
-              computer-vision systems when the problem is right.
+              On the AI side I build practical features on top of LLM APIs —
+              streaming assistants with tool calling and conversational memory,
+              semantic search over embeddings, and OpenCV computer-vision
+              pipelines. I use AI-assisted development heavily to ship quickly.
+              Based in Bhopal, India; open to remote and on-site roles.
             </p>
 
             <div
