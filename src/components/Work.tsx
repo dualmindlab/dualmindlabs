@@ -142,12 +142,19 @@ type Featured = {
   status: StatusKind;
   problem: string;
   contribution: string;
-  implementation: string;
+  implementation: string | string[];
+  technicalDetails?: string;
   statusNote: string;
   stack: string[];
   link?: { url: string; label: string };
   media:
-    | { kind: "image"; src: string; monogram: string }
+    | {
+        kind: "image";
+        src: string;
+        monogram: string;
+        imageFit?: "cover" | "contain";
+        fullImage?: boolean;
+      }
     | { kind: "detail"; monogram: string; features: string[] };
 };
 
@@ -163,8 +170,14 @@ const featured: Featured[] = [
       "Matrimonial platforms match on filters, not on how two people actually communicate or whether their families align.",
     contribution:
       "I built the platform end to end — profiles, authentication, chat and payment integrations — and designed and wired its AI layer.",
-    implementation:
-      "A streaming, multi-turn AI assistant with conversational memory and 13 read-only tools, backed by a provider-agnostic layer that switches between Gemini and Claude. Semantic profile re-ranking runs on 768-dimensional embeddings in PostgreSQL/pgvector. Six user-facing AI features are wired end to end — a conversation coach, a sentiment-based emotional score, an experimental compatibility-risk indicator, family-values compatibility, the streaming assistant and semantic re-ranking. Further backend/admin models (churn risk, response-rate reputation, marriage-readiness and profile optimisation) are implemented without a public UI.",
+    implementation: [
+      "Streaming, multi-turn assistant with conversational memory and read-only tool calling.",
+      "Provider-agnostic AI layer supporting Gemini and Claude.",
+      "Semantic profile re-ranking with embeddings in PostgreSQL / pgvector.",
+      "Conversation coaching, emotional scoring and experimental compatibility indicators.",
+    ],
+    technicalDetails:
+      "Semantic profile re-ranking uses 768-dimensional embeddings. Six user-facing AI features are wired end to end: a conversation coach, a sentiment-based emotional score, an experimental compatibility-risk indicator, family-values compatibility, the streaming assistant and semantic re-ranking. Further backend/admin models for churn risk, response-rate reputation, marriage-readiness and profile optimisation are implemented without a public UI.",
     statusNote:
       "Pre-launch: company registration is pending and the environment currently runs on dummy data and services ahead of commercial launch. The compatibility and risk indicators are experimental, not scientifically validated.",
     stack: [
@@ -179,6 +192,8 @@ const featured: Featured[] = [
     media: {
       kind: "image",
       src: "/media/smart-shaadi.jpg",
+      imageFit: "contain",
+      fullImage: true,
       monogram: "SS",
     },
   },
@@ -217,10 +232,10 @@ const featured: Featured[] = [
     contribution:
       "I built and deployed the live website and its admin tooling, and developed the companion Android app.",
     implementation:
-      "Medicine composition search, prescription upload, order management and catalogue import/export for bulk inventory — built on Next.js and Node.js with payment and order flows.",
+      "Medicine composition search, prescription upload, order management and catalogue import/export for bulk inventory — built on Next.js and Node.js with MongoDB / Mongoose, payment and order flows. The companion Android app uses Capacitor.",
     statusNote:
-      "Live website. The Android app is in Google Play testing, not yet publicly launched.",
-    stack: ["Next.js", "Node.js", "PostgreSQL", "Payments"],
+      "Live website. Capacitor Android app in Google Play testing, not yet publicly launched.",
+    stack: ["Next.js", "Node.js", "MongoDB / Mongoose", "Capacitor", "Payments"],
     link: { url: "https://www.pratigyamedicalstore.com/", label: "Visit site" },
     media: {
       kind: "image",
@@ -230,7 +245,7 @@ const featured: Featured[] = [
   },
 ];
 
-function FeatureBlock({ label, body }: { label: string; body: string }) {
+function FeatureBlock({ label, body }: { label: string; body: string | string[] }) {
   return (
     <div style={{ marginBottom: "1rem" }}>
       <p
@@ -239,12 +254,22 @@ function FeatureBlock({ label, body }: { label: string; body: string }) {
       >
         {label}
       </p>
-      <p
-        className="text-body-sm"
-        style={{ color: "var(--color-text-secondary)" }}
-      >
-        {body}
-      </p>
+      {Array.isArray(body) ? (
+        <ul
+          className="text-body-sm"
+          style={{
+            color: "var(--color-text-secondary)",
+            listStyleType: "disc",
+            paddingLeft: "1.2rem",
+            display: "grid",
+            gap: "0.4rem",
+          }}
+        >
+          {body.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      ) : (
+        <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{body}</p>
+      )}
     </div>
   );
 }
@@ -264,14 +289,28 @@ function FeatureRow({ project, index }: { project: Featured; index: number }) {
       {/* Media / detail */}
       <div style={{ position: "relative" }}>
         {project.media.kind === "image" ? (
-          <ProjectMedia
-            type="image"
-            src={project.media.src}
-            monogram={project.media.monogram}
-            alt={`${project.name} — ${project.category}`}
-            accent={accent}
-            category={project.category}
-          />
+          <>
+            <ProjectMedia
+              imageFit={project.media.imageFit}
+              type="image"
+              src={project.media.src}
+              monogram={project.media.monogram}
+              alt={`${project.name} — ${project.category}`}
+              accent={accent}
+              category={project.category}
+            />
+            {project.media.fullImage && (
+              <a
+                href={project.media.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline text-mono-sm"
+                style={{ display: "inline-block", marginTop: "0.75rem", color: "var(--color-accent-teal)" }}
+              >
+                Open full screenshot <span aria-hidden>↗</span>
+              </a>
+            )}
+          </>
         ) : (
           <div className="project-detail-panel">
             <div
@@ -358,6 +397,12 @@ function FeatureRow({ project, index }: { project: Featured; index: number }) {
         <FeatureBlock label="Problem" body={project.problem} />
         <FeatureBlock label="My contribution" body={project.contribution} />
         <FeatureBlock label="Implementation" body={project.implementation} />
+        {project.technicalDetails && (
+          <details style={{ marginBottom: "1rem", color: "var(--color-text-secondary)" }}>
+            <summary className="text-body-sm" style={{ cursor: "pointer", color: "var(--color-accent-teal)" }}>Technical details</summary>
+            <p className="text-body-sm" style={{ marginTop: "0.75rem" }}>{project.technicalDetails}</p>
+          </details>
+        )}
         <FeatureBlock label="Current status" body={project.statusNote} />
 
         <div style={{ margin: "1.25rem 0" }}>

@@ -12,14 +12,10 @@ import { useEffect, useRef, useState } from "react";
 import { RESUME_PATH } from "@/lib/site";
 
 const headlineWords: { text: string; color: string }[] = [
-  { text: "I",            color: "var(--color-text-primary)" },
-  { text: "build",        color: "var(--color-text-primary)" },
-  { text: "full-stack",   color: "var(--color-accent-teal)" },
-  { text: "web",          color: "var(--color-text-primary)" },
-  { text: "platforms",    color: "var(--color-text-primary)" },
-  { text: "and",          color: "var(--color-text-primary)" },
-  { text: "applied-AI",   color: "var(--color-accent-purple)" },
-  { text: "features.",    color: "var(--color-text-primary)" },
+  { text: "Full-stack", color: "var(--color-accent-teal)" },
+  { text: "platforms.", color: "var(--color-text-primary)" },
+  { text: "Applied", color: "var(--color-accent-purple)" },
+  { text: "AI.", color: "var(--color-text-primary)" },
 ];
 
 const roles = [
@@ -195,7 +191,7 @@ export default function Hero() {
             style={{ maxWidth: "820px" }}
           >
             {/* Availability pill */}
-            <motion.div variants={fadeUp} style={{ marginBottom: "2rem" }}>
+            <motion.div variants={fadeUp} style={{ marginBottom: "1.25rem" }}>
               <div
                 style={{
                   display: "inline-flex",
@@ -230,7 +226,7 @@ export default function Hero() {
             {/* Headline */}
             <motion.h1
               variants={container}
-              className="text-h1"
+              className="text-h1 hero-heading"
               style={{
                 marginBottom: "1.5rem",
                 display: "flex",
@@ -252,7 +248,7 @@ export default function Hero() {
                     style={{ display: "inline-block", color: w.color }}
                   >
                     {w.text}
-                  </motion.span>
+                  </motion.span>{i < headlineWords.length - 1 ? " " : null}
                 </span>
               ))}
             </motion.h1>
@@ -263,7 +259,7 @@ export default function Hero() {
               className="text-subhead"
               style={{
                 color: "var(--color-text-secondary)",
-                marginBottom: "1.6rem",
+                marginBottom: "1rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
@@ -313,12 +309,9 @@ export default function Hero() {
                 fontWeight: 400,
               }}
             >
-              I turn client requirements into shipped software — owning{" "}
-              <span style={{ color: "var(--color-text-primary)", fontWeight: 500 }}>
-                architecture, development, integrations and deployment
-              </span>
-              . Experience across e-commerce, matrimonial platforms and
-              industrial IoT, with AI features built on LLM APIs, tool calling,
+              I build and ship web platforms for e-commerce, matrimonial services
+              and industrial IoT — owning architecture, development, integrations
+              and deployment. I add applied-AI features with LLM APIs, tool calling,
               semantic search and OpenCV.
             </motion.p>
 
@@ -326,7 +319,7 @@ export default function Hero() {
             <motion.p
               variants={fadeUp}
               className="text-mono-sm"
-              style={{ color: "var(--color-text-muted)", marginBottom: "2.25rem" }}
+              style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}
             >
               Bhopal, India ·{" "}
               <span style={{ color: "var(--color-text-secondary)" }}>

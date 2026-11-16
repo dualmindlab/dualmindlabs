@@ -26,6 +26,8 @@ The About section continues to use `ashwin.jpg`.
 
 ## Screenshots
 
-The display frames are 16:10 and crop images to fill. For future replacements,
-use a matching crop and JPEG quality 80–85. Images are served without automatic
+The display frames are 16:10 and normally crop images to fill. Smart Shaadi
+uses the complete original landing capture with `contain` and a link to open
+the full-resolution screenshot, preserving the text at the image edges.
+For future replacements, use JPEG quality 80–85 and preserve meaningful content. Images are served without automatic
 optimization because this site uses Next.js static export.

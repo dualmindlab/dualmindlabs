@@ -75,31 +75,6 @@ export default function About() {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  backgroundImage:
-                    "radial-gradient(circle, var(--color-border) 1px, transparent 1px)",
-                  backgroundSize: "18px 18px",
-                  opacity: 0.18,
-                  pointerEvents: "none",
-                }}
-              />
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: "70%",
-                  height: "70%",
-                  background:
-                    "linear-gradient(225deg, rgba(6,201,168,0.12), transparent 60%)",
-                  pointerEvents: "none",
-                }}
-              />
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: 0,
                   background:
                     "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.18) 38%, transparent 62%)",
                   pointerEvents: "none",
@@ -139,20 +114,6 @@ export default function About() {
                   Full-Stack Engineer · Bhopal, India
                 </span>
               </div>
-
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  height: "1px",
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(6,201,168,0.5), transparent)",
-                  animation: "scan-line 4s linear infinite",
-                  pointerEvents: "none",
-                }}
-              />
             </div>
 
             <p

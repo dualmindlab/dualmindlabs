@@ -14,6 +14,7 @@ interface ProjectMediaProps {
   category?: string;
   monogram?: string;
   aspectRatio?: string;
+  imageFit?: "cover" | "contain";
 }
 
 export default function ProjectMedia({
@@ -25,6 +26,7 @@ export default function ProjectMedia({
   category,
   monogram,
   aspectRatio = "16 / 10",
+  imageFit = "cover",
 }: ProjectMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -78,7 +80,7 @@ export default function ProjectMedia({
           fill
           sizes="(max-width: 900px) 100vw, 50vw"
           onError={() => setFailed(true)}
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: imageFit }}
         />
       )}
 

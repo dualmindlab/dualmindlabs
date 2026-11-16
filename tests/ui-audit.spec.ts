@@ -5,11 +5,13 @@ const sections = ["About", "Work", "Experience", "Skills", "Contact"];
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
+  // Wait for hydration before filling controlled inputs or using animated controls.
+  await expect(page.locator(".hero-ctas")).toHaveCSS("opacity", "1");
 });
 
 test("current portfolio sections and navigation work", async ({ page, isMobile }) => {
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("full-stack");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("applied-AI");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Full-stack");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Applied AI");
   const nav = page.getByRole("navigation");
   const menu = nav.getByRole("button", { name: "Toggle menu" });
   if (isMobile) {
@@ -26,6 +28,37 @@ test("current portfolio sections and navigation work", async ({ page, isMobile }
   await expect(page).toHaveURL(/#work$/);
   await expect(page.getByRole("heading", { name: "Featured case studies." })).toBeVisible();
   if (isMobile) await expect(menu).toHaveAttribute("aria-expanded", "false");
+});
+
+test("hero actions fit a typical laptop viewport", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Desktop layout acceptance check");
+  for (const viewport of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const hero = page.locator("#hero");
+    await expect(hero.locator(".hero-ctas")).toHaveCSS("opacity", "1");
+    for (const locator of [hero.getByRole("heading", { level: 1 }), hero.getByRole("link", { name: /view projects/i }), hero.getByRole("link", { name: /résumé/i })]) {
+      const bounds = await locator.boundingBox();
+      expect(bounds).not.toBeNull();
+      expect(bounds!.y).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height);
+    }
+  }
+});
+
+test("Smart Shaadi technical details expand with the keyboard", async ({ page }) => {
+  const article = page.locator("#work article").filter({ has: page.getByRole("heading", { name: "Smart Shaadi", exact: true }) });
+  const details = article.locator("details");
+  await expect(details).not.toHaveAttribute("open");
+  await expect(article.getByText(/read-only tool calling/)).toBeVisible();
+  await expect(article.getByText(/Pre-launch: company registration/)).toBeVisible();
+  await details.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(details).toHaveAttribute("open", "");
+  await expect(details.getByText(/768-dimensional/)).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(details).not.toHaveAttribute("open");
+  await expect(article.getByRole("link", { name: /open full screenshot/i })).toHaveAttribute("href", "/media/smart-shaadi.jpg");
 });
 
 test("all project screenshots load and retain their status labels", async ({ page }) => {
